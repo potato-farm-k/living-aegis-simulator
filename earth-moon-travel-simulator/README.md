@@ -1,10 +1,12 @@
 # Earth-Moon True Scale Travel Simulator
 
-지구와 달의 실제 크기 및 거리 비율을 1:1:1로 보여주는 Three.js 기반 3D 시뮬레이터입니다.
+지구와 달의 실제 크기 및 거리 비율을 1:1:1로 보여주는 Three.js 기반 3D simulator입니다.
+
+이 simulator는 Living Aegis Origin 제작을 위한 참고 도구이며, 메인 게임 자체는 아니다. 메인 게임은 `living-aegis-origin`에서 관리하고, 게임 기능 실험은 `living-aegis-prototype`에서 관리한다.
 
 ## 상태
 
-기존 시뮬레이터입니다. `living-aegis-simulator` 루트 런처에서 이 폴더로 연결합니다.
+기존 simulator입니다. `living-aegis-simulator` 루트 런처에서 이 폴더로 연결합니다.
 
 실행 진입점:
 
@@ -36,3 +38,4 @@ python3 -m http.server 8000
 
 - 루트 scaffold 작업에서는 기존 기능을 변경하지 않습니다.
 - 기존 코드 구조와 실행 파일 경로를 리팩터링하지 않습니다.
+- 내부 설명 문서는 한국어 중심으로 작성하되, 파일명, 폴더명, 코드 식별자, 주요 기술 용어는 영어를 유지합니다.

@@ -1,17 +1,16 @@
 # Light Delay Notes
 
-## Purpose
+## 목적
 
-Notes about light travel time, information delay, and possible simulation
-references for Living Aegis Origin.
+Living Aegis Origin 제작에 참고할 light travel time, information delay, simulation reference를 정리하는 메모 문서이다.
 
-## References To Add Later
+## 이후 추가할 reference
 
 - Earth-Moon light travel time
-- One-way and round-trip signal delay
-- Visual feedback timing references
-- Game interpretation notes
+- one-way / round-trip signal delay
+- visual feedback timing reference
+- 게임 화면에서의 해석 메모
 
-## Current Status
+## 현재 상태
 
-Scaffold only.
+현재는 scaffold 단계이다. 아직 계산값이나 구체적인 gameplay 반영 기준은 기록하지 않았다.
