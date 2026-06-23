@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#02050a">
+  <title>Earth ↔ Moon / 실제 축척 여행</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap");
+
+    :root {
+      color-scheme: dark;
+      --bg: #02050a;
+      --panel: rgba(5, 12, 20, 0.78);
+      --panel-solid: #08111c;
+      --line: rgba(166, 207, 231, 0.15);
+      --line-bright: rgba(166, 222, 255, 0.35);
+      --ink: #eef8ff;
+      --muted: #8497a6;
+      --faint: #4f6473;
+      --cyan: #74e6ff;
+      --blue: #4291ff;
+      --amber: #ffcc72;
+      --green: #83f5bd;
+      --red: #ff7e74;
+      --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --sans: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--bg); }
+    body { color: var(--ink); font-family: var(--sans); }
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    #scene {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    #scene canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+
+    #scene canvas:active { cursor: grabbing; }
+
+    .grain, .vignette, .scanline {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .grain {
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+    }
+
+    .vignette { box-shadow: inset 0 0 180px 38px rgba(0, 0, 0, 0.72); }
+    .scanline {
+      opacity: 0.09;
+      background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(116, 230, 255, 0.08) 4px);
+    }
+
+    .hud {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) 1fr minmax(300px, 360px);
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      padding: 20px;
+      pointer-events: none;
+    }
+
+    .hud > * { pointer-events: auto; }
+
+    .topbar {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .brand { display: flex; align-items: center; gap: 13px; }
+
+    .brand-mark {
+      position: relative;
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line-bright);
+      border-radius: 50%;
+      box-shadow: 0 0 28px rgba(116, 230, 255, 0.12), inset 0 0 16px rgba(116, 230, 255, 0.1);
+    }
+
+    .brand-mark::before, .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      transform: rotateX(68deg) rotateZ(-18deg);
+    }
+
+    .brand-mark::after {
+      inset: 15px;
+      border-color: var(--amber);
+      background: var(--amber);
+      box-shadow: 0 0 13px var(--amber);
+    }
+
+    .brand strong, .brand span { display: block; }
+    .brand strong { font: 600 0.8rem/1.2 var(--mono); letter-spacing: 0.16em; }
+    .brand span { margin-top: 5px; color: var(--muted); font: 400 0.61rem/1 var(--mono); letter-spacing: 0.13em; }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid var(--line);
+      padding: 9px 12px;
+      background: rgba(3, 9, 15, 0.5);
+      color: var(--muted);
+      font: 500 0.62rem/1 var(--mono);
+      letter-spacing: 0.13em;
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px var(--green);
+    }
+
+    .panel {
+      align-self: end;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      background:
+        linear-gradient(135deg, rgba(116, 230, 255, 0.035), transparent 30%),
+        var(--panel);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      padding: 12px 14px;
+    }
+
+    .panel-kicker {
+      margin: 0;
+      color: var(--cyan);
+      font: 600 0.58rem/1 var(--mono);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .panel-id { color: var(--faint); font: 500 0.56rem/1 var(--mono); }
+
+    .telemetry { grid-column: 1; grid-row: 2; }
+    .controls { grid-column: 3; grid-row: 2 / 4; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--line);
+    }
+
+    .metric {
+      min-width: 0;
+      padding: 13px 14px;
+      background: rgba(5, 12, 20, 0.88);
+    }
+
+    .metric span, .metric strong, .metric small { display: block; }
+    .metric span { color: var(--muted); font: 500 0.55rem/1 var(--mono); letter-spacing: 0.09em; }
+    .metric strong {
+      overflow: hidden;
+      margin-top: 8px;
+      color: var(--ink);
+      font: 500 clamp(0.9rem, 1.45vw, 1.2rem)/1 var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .metric small { margin-top: 6px; color: var(--faint); font: 400 0.54rem/1 var(--mono); }
+    .metric.accent strong { color: var(--cyan); }
+
+    .journey {
+      padding: 15px 14px 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .journey-labels, .journey-foot {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font: 500 0.54rem/1 var(--mono);
+      letter-spacing: 0.05em;
+    }
+
+    .journey-track {
+      position: relative;
+      height: 22px;
+      margin: 11px 0 8px;
+    }
+
+    .journey-track::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 0;
+      left: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan) 50%, var(--amber));
+      box-shadow: 0 0 8px rgba(116, 230, 255, 0.4);
+    }
+
+    .journey-track::after {
+      content: "";
+      position: absolute;
+      top: 7px;
+      right: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 8px var(--amber);
+    }
+
+    .probe-dot {
+      position: absolute;
+      z-index: 1;
+      top: 6px;
+      left: 0;
+      width: 9px;
+      height: 9px;
+      border: 1px solid white;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+      transform: translateX(-50%);
+      transition: left 80ms linear;
+    }
+
+    .control-body {
+      max-height: calc(100vh - 125px);
+      overflow-y: auto;
+      padding: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--line-bright) transparent;
+    }
+
+    .control-section + .control-section {
+      margin-top: 18px;
+      padding-top: 17px;
+      border-top: 1px solid var(--line);
+    }
+
+    .control-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      color: var(--muted);
+      font: 600 0.58rem/1 var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .control-title::before {
+      content: "";
+      width: 12px;
+      height: 1px;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+    }
+
+    .choice-list { display: grid; gap: 6px; }
+
+    .choice {
+      position: relative;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 2px;
+      padding: 10px 11px 9px 14px;
+      background: rgba(255, 255, 255, 0.015);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .choice:hover { border-color: var(--line-bright); transform: translateX(-2px); }
+    .choice.active {
+      border-color: rgba(116, 230, 255, 0.48);
+      background: rgba(116, 230, 255, 0.07);
+    }
+
+    .choice.active::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      left: -1px;
+      width: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 9px var(--cyan);
+    }
+
+    .choice strong, .choice span { display: block; }
+    .choice strong { font: 600 0.68rem/1.25 var(--mono); letter-spacing: 0.02em; }
+    .choice span { margin-top: 5px; color: var(--muted); font: 400 0.57rem/1.35 var(--mono); }
+    .choice .choice-time { position: absolute; top: 10px; right: 10px; margin: 0; color: var(--cyan); }
+
+    .camera-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .camera-grid .choice { padding: 10px 5px; text-align: center; }
+    .camera-grid .choice strong { font-size: 0.58rem; }
+    .camera-grid .choice span { font-size: 0.5rem; }
+    .camera-grid .choice.active::before { top: auto; right: -1px; bottom: -1px; width: auto; height: 2px; }
+
+    .warp-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .warp-value { color: var(--cyan); font: 600 1.2rem/1 var(--mono); }
+    .warp-hint { color: var(--muted); font: 400 0.53rem/1 var(--mono); }
+
+    input[type="range"] {
+      width: 100%;
+      height: 2px;
+      margin: 9px 0 12px;
+      appearance: none;
+      background: linear-gradient(90deg, var(--cyan) var(--range-fill, 0%), rgba(255,255,255,.13) var(--range-fill, 0%));
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      width: 12px;
+      height: 12px;
+      appearance: none;
+      border: 2px solid #06101a;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 12px var(--cyan);
+    }
+
+    .warp-ticks { display: flex; justify-content: space-between; color: var(--faint); font: 500 0.48rem/1 var(--mono); }
+
+    .actions { display: grid; grid-template-columns: 1fr auto; gap: 7px; margin-top: 17px; }
+    .primary, .secondary {
+      border: 1px solid var(--line-bright);
+      border-radius: 2px;
+      padding: 12px;
+      cursor: pointer;
+      font: 600 0.65rem/1 var(--mono);
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .primary { background: var(--cyan); color: #031019; box-shadow: 0 0 20px rgba(116, 230, 255, 0.16); }
+    .primary:hover { background: #b1f2ff; }
+    .secondary { width: 42px; background: rgba(255,255,255,.025); color: var(--muted); }
+    .secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .scale-note {
+      display: flex;
+      gap: 9px;
+      margin: 15px 0 0;
+      color: var(--muted);
+      font: 400 0.53rem/1.55 var(--mono);
+    }
+    .scale-note::before { content: "i"; color: var(--cyan); font-weight: 600; }
+
+    .caption {
+      grid-column: 1 / 3;
+      grid-row: 3;
+      align-self: end;
+      pointer-events: none;
+    }
+
+    .caption-line {
+      width: 42px;
+      height: 1px;
+      margin-bottom: 12px;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+    }
+
+    .caption h1 {
+      max-width: 720px;
+      margin: 0;
+      font: 500 clamp(1.7rem, 3.3vw, 3.45rem)/1.08 var(--sans);
+      letter-spacing: -0.055em;
+      text-shadow: 0 4px 28px rgba(0,0,0,.9);
+    }
+    .caption h1 em { color: var(--cyan); font-style: normal; }
+    .caption p {
+      max-width: 590px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font: 400 0.67rem/1.7 var(--mono);
+      text-shadow: 0 2px 15px #000;
+    }
+
+    .object-label {
+      position: fixed;
+      z-index: 1;
+      display: none;
+      pointer-events: none;
+      transform: translate(13px, -50%);
+    }
+    .object-label::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: calc(100% + 7px);
+      width: 24px;
+      height: 1px;
+      background: var(--line-bright);
+    }
+    .object-label strong, .object-label span { display: block; }
+    .object-label strong { font: 600 0.59rem/1 var(--mono); letter-spacing: 0.12em; }
+    .object-label span { margin-top: 5px; color: var(--muted); font: 400 0.5rem/1 var(--mono); letter-spacing: 0.04em; }
+
+    .mobile-toggle { display: none; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+    @media (max-width: 1020px) {
+      .hud { grid-template-columns: minmax(250px, 310px) 1fr; }
+      .controls { position: fixed; top: 76px; right: 14px; bottom: 14px; z-index: 5; width: min(350px, calc(100vw - 28px)); transform: translateX(calc(100% + 24px)); transition: transform 220ms ease; }
+      .controls.open { transform: translateX(0); }
+      .control-body { max-height: calc(100vh - 130px); }
+      .caption { grid-column: 1 / -1; padding-right: 60px; }
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        z-index: 6;
+        right: 14px;
+        bottom: 14px;
+        border: 1px solid var(--line-bright);
+        padding: 11px 13px;
+        background: var(--panel-solid);
+        color: var(--cyan);
+        font: 600 0.58rem/1 var(--mono);
+        letter-spacing: .08em;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .hud { display: block; padding: 12px; }
+      .topbar { position: fixed; top: 12px; right: 12px; left: 12px; }
+      .status { display: none; }
+      .telemetry { position: fixed; top: 70px; right: 12px; left: 12px; }
+      .telemetry .panel-head, .journey { display: none; }
+      .metric-grid { grid-template-columns: repeat(3, 1fr); }
+      .metric { padding: 9px; }
+      .metric:nth-child(n+4) { display: none; }
+      .metric strong { font-size: .72rem; }
+      .metric span, .metric small { font-size: .45rem; }
+      .caption { position: fixed; right: 64px; bottom: 12px; left: 12px; }
+      .caption h1 { font-size: 1.45rem; }
+      .caption p { display: none; }
+      .object-label { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="scene" aria-label="지구와 달 사이 실제 축척 3D 시뮬레이션"></div>
+  <div class="grain"></div>
+  <div class="vignette"></div>
+  <div class="scanline"></div>
+
+  <main class="hud">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>
+          <strong>EARTH / MOON TRANSIT</strong>
+          <span>TRUE SCALE SPATIAL SIMULATOR</span>
+        </span>
+      </div>
+      <div class="status"><span class="status-dot"></span><span id="status-text">SYSTEM READY · AWAITING LAUNCH</span></div>
+    </header>
+
+    <section class="panel telemetry" aria-labelledby="telemetry-title">
+      <div class="panel-head">
+        <h2 class="panel-kicker" id="telemetry-title">Live telemetry</h2>
+        <span class="panel-id">TLM-01</span>
+      </div>
+      <div class="metric-grid">
+        <div class="metric accent"><span>SIM ELAPSED</span><strong id="elapsed">00:00:00</strong><small>simulated time</small></div>
+        <div class="metric"><span>VELOCITY</span><strong id="velocity">299,792 km/s</strong><small id="velocity-c">1.000 c</small></div>
+        <div class="metric"><span>DISTANCE TO MOON</span><strong id="distance">376,292 km</strong><small>surface to surface</small></div>
+        <div class="metric"><span>ONE-WAY ETA</span><strong id="eta">1.26 sec</strong><small>at current velocity</small></div>
+        <div class="metric"><span>RADIO PING</span><strong>2.56 sec</strong><small>Earth ↔ Moon</small></div>
+        <div class="metric"><span>ORBIT INCLINE</span><strong>5.145°</strong><small>to ecliptic plane</small></div>
+      </div>
+      <div class="journey">
+        <div class="journey-labels"><span>EARTH</span><span id="phase-label">OUTBOUND</span><span>MOON</span></div>
+        <div class="journey-track"><span class="probe-dot" id="probe-dot"></span></div>
+        <div class="journey-foot"><span id="progress-label">0.00%</span><span>384,400 km center distance</span></div>
+      </div>
+    </section>
+
+    <aside class="panel controls" id="controls" aria-labelledby="controls-title">
+      <div class="panel-head">
+        <h2 class="panel-kicker" id="controls-title">Control tower</h2>
+        <span class="panel-id">CTL-07</span>
+      </div>
+      <div class="control-body">
+        <section class="control-section">
+          <h3 class="control-title">Select vehicle</h3>
+          <div class="choice-list" id="vehicle-list">
+            <button class="choice active" type="button" data-vehicle="laser">
+              <strong>LIGHT / LASER</strong><span>299,792 km/s · universal limit</span><span class="choice-time">1.26s</span>
+            </button>
+            <button class="choice" type="button" data-vehicle="impulse">
+              <strong>IMPULSE ENGINE</strong><span>74,948 km/s · fictional 0.25c</span><span class="choice-time">5.05s</span>
+            </button>
+            <button class="choice" type="button" data-vehicle="parker">
+              <strong>PARKER SOLAR PROBE</strong><span>191 km/s · fastest human object</span><span class="choice-time">33m</span>
+            </button>
+            <button class="choice" type="button" data-vehicle="apollo">
+              <strong>APOLLO SPACECRAFT</strong><span>11 km/s · historic crewed flight</span><span class="choice-time">9h 30m</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <h3 class="control-title">Camera mode</h3>
+          <div class="camera-grid" id="camera-list">
+            <button class="choice active" type="button" data-camera="cinematic"><strong>CINEMA</strong><span>orbit</span></button>
+            <button class="choice" type="button" data-camera="earth"><strong>EARTH</strong><span>station</span></button>
+            <button class="choice" type="button" data-camera="follow"><strong>FOLLOW</strong><span>probe</span></button>
+          </div>
+        </section>
+
+        <section class="control-section">
+          <h3 class="control-title">Time warp</h3>
+          <div class="warp-row"><strong class="warp-value" id="warp-value">1×</strong><span class="warp-hint">REAL SECOND : SIM TIME</span></div>
+          <label class="sr-only" for="warp-slider">시간 배속</label>
+          <input id="warp-slider" type="range" min="0" max="100" value="0" step="1">
+          <div class="warp-ticks"><span>1×</span><span>100×</span><span>10K×</span><span>100K×</span></div>
+        </section>
+
+        <div class="actions">
+          <button class="primary" id="play-button" type="button">Launch simulation</button>
+          <button class="secondary" id="reset-button" type="button" aria-label="시뮬레이션 초기화">↺</button>
+        </div>
+        <p class="scale-note">지구, 달, 거리 비율은 1:1:1입니다. 탐사체와 궤적 두께만 식별을 위해 확대했습니다.</p>
+      </div>
+    </aside>
+
+    <section class="caption" aria-live="polite">
+      <div class="caption-line"></div>
+      <h1 id="caption-title">빛조차 <em>1.26초</em>가 필요한 거리.</h1>
+      <p id="caption-copy">지구와 달의 실제 크기와 거리를 그대로 놓았습니다. 드래그로 회전하고 스크롤로 우주의 거대한 공백을 직접 확인하세요.</p>
+    </section>
+  </main>
+
+  <button class="mobile-toggle" id="mobile-toggle" type="button">CONTROL TOWER</button>
+  <div class="object-label" id="earth-label"><strong>EARTH</strong><span>Ø 12,742 km</span></div>
+  <div class="object-label" id="moon-label"><strong>MOON</strong><span>Ø 3,475 km</span></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const EARTH_RADIUS = 6.371;
+      const MOON_RADIUS = 1.7374;
+      const CENTER_DISTANCE = 384.4;
+      const SURFACE_DISTANCE_KM = (CENTER_DISTANCE - EARTH_RADIUS - MOON_RADIUS) * 1000;
+      const C = 299792.458;
+      const INCLINATION = THREE.MathUtils.degToRad(5.145);
+
+      const vehicles = {
+        laser: { name: "LIGHT / LASER", speed: C, color: 0x74e6ff, warp: 1, title: "빛조차 <em>1.26초</em>가 필요한 거리.", copy: "달에 닿은 신호가 지구로 돌아오기까지 약 2.56초. 실시간 대화가 불가능한 첫 번째 이유입니다." },
+        impulse: { name: "IMPULSE ENGINE", speed: C * 0.25, color: 0xb58cff, warp: 1, title: "광속의 25%, <em>5초의 질주.</em>", copy: "가상의 임펄스 엔진도 달까지 5초 이상 달려야 합니다. 우주의 거리는 속도 감각을 다시 씁니다." },
+        parker: { name: "PARKER SOLAR PROBE", speed: 191, color: 0xffcc72, warp: 100, title: "인류 최고 속도도 <em>33분.</em>", copy: "초속 191 km의 파커 태양 탐사선. 100배 타임워프로 인간이 만든 가장 빠른 물체의 여정을 지켜보세요." },
+        apollo: { name: "APOLLO SPACECRAFT", speed: 11, color: 0xff8f70, warp: 10000, title: "아폴로의 속도로 <em>9시간 30분.</em>", copy: "실제 아폴로 임무는 궤도와 감속 때문에 약 3일이 걸렸습니다. 여기서는 일정한 최고 속도를 비교합니다." }
+      };
+
+      const state = {
+        vehicle: "laser",
+        camera: "cinematic",
+        warp: 1,
+        running: false,
+        elapsed: 0,
+        phase: "OUTBOUND",
+        completed: false
+      };
+
+      const ui = {
+        scene: document.querySelector("#scene"),
+        status: document.querySelector("#status-text"),
+        elapsed: document.querySelector("#elapsed"),
+        velocity: document.querySelector("#velocity"),
+        velocityC: document.querySelector("#velocity-c"),
+        distance: document.querySelector("#distance"),
+        eta: document.querySelector("#eta"),
+        phase: document.querySelector("#phase-label"),
+        progress: document.querySelector("#progress-label"),
+        dot: document.querySelector("#probe-dot"),
+        warp: document.querySelector("#warp-value"),
+        slider: document.querySelector("#warp-slider"),
+        play: document.querySelector("#play-button"),
+        reset: document.querySelector("#reset-button"),
+        title: document.querySelector("#caption-title"),
+        copy: document.querySelector("#caption-copy"),
+        controls: document.querySelector("#controls"),
+        mobileToggle: document.querySelector("#mobile-toggle"),
+        earthLabel: document.querySelector("#earth-label"),
+        moonLabel: document.querySelector("#moon-label")
+      };
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x010308);
+      scene.fog = new THREE.FogExp2(0x010308, 0.0006);
+
+      const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.05, 2200);
+      camera.position.set(180, 95, 490);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.1;
+      ui.scene.appendChild(renderer.domElement);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.045;
+      controls.minDistance = 16;
+      controls.maxDistance = 850;
+      controls.target.set(CENTER_DISTANCE * 0.45, -70, 0);
+
+      const moonPosition = new THREE.Vector3(
+        CENTER_DISTANCE * Math.cos(INCLINATION),
+        CENTER_DISTANCE * Math.sin(INCLINATION),
+        CENTER_DISTANCE * Math.sin(INCLINATION) * 0.48
+      );
+      const travelDirection = moonPosition.clone().normalize();
+      const startPoint = travelDirection.clone().multiplyScalar(EARTH_RADIUS + 1.2);
+      const endPoint = moonPosition.clone().addScaledVector(travelDirection, -(MOON_RADIUS + 1.2));
+      const visualPathLength = startPoint.distanceTo(endPoint);
+
+      const ambient = new THREE.AmbientLight(0x21334a, 0.55);
+      scene.add(ambient);
+      const sun = new THREE.DirectionalLight(0xfff3d5, 2.4);
+      sun.position.set(-90, 100, 120);
+      scene.add(sun);
+
+      createStars();
+      createReferencePlane();
+      const earth = createEarth();
+      const moon = createMoon();
+      moon.position.copy(moonPosition);
+      scene.add(earth, moon);
+
+      const path = createPath();
+      scene.add(path);
+      const probe = createProbe();
+      probe.position.copy(startPoint);
+      scene.add(probe);
+
+      const clock = new THREE.Clock();
+      let cameraTime = 0;
+      updateVehicle("laser");
+      updateTelemetry(0);
+      animate();
+
+      function createStars() {
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        const colors = [];
+        const color = new THREE.Color();
+        for (let i = 0; i < 6500; i++) {
+          const radius = 520 + Math.random() * 1050;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          positions.push(
+            radius * Math.sin(phi) * Math.cos(theta),
+            radius * Math.cos(phi),
+            radius * Math.sin(phi) * Math.sin(theta)
+          );
+          color.setHSL(0.52 + Math.random() * 0.12, 0.22 + Math.random() * 0.42, 0.55 + Math.random() * 0.4);
+          colors.push(color.r, color.g, color.b);
+        }
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+        const material = new THREE.PointsMaterial({ size: 0.75, sizeAttenuation: true, vertexColors: true, transparent: true, opacity: 0.85 });
+        scene.add(new THREE.Points(geometry, material));
+      }
+
+      function createReferencePlane() {
+        const points = [];
+        const segments = 220;
+        for (let i = 0; i <= segments; i++) {
+          const a = (i / segments) * Math.PI * 2;
+          points.push(new THREE.Vector3(Math.cos(a) * CENTER_DISTANCE, 0, Math.sin(a) * CENTER_DISTANCE));
+        }
+        const line = new THREE.Line(
+          new THREE.BufferGeometry().setFromPoints(points),
+          new THREE.LineBasicMaterial({ color: 0x3a8fb2, transparent: true, opacity: 0.12 })
+        );
+        line.rotation.z = INCLINATION;
+        scene.add(line);
+      }
+
+      function createEarth() {
+        const group = new THREE.Group();
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            lightDirection: { value: sun.position.clone().normalize() },
+            time: { value: 0 }
+          },
+          vertexShader: `
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              vPosition = position;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            varying vec3 vNormal;
+            varying vec3 vPosition;
+            uniform vec3 lightDirection;
+            uniform float time;
+            float hash(vec3 p) { p = fract(p * .3183099 + .1); p *= 17.0; return fract(p.x*p.y*p.z*(p.x+p.y+p.z)); }
+            float noise(vec3 x) {
+              vec3 i = floor(x); vec3 f = fract(x); f = f*f*(3.0-2.0*f);
+              return mix(mix(mix(hash(i),hash(i+vec3(1,0,0)),f.x),mix(hash(i+vec3(0,1,0)),hash(i+vec3(1,1,0)),f.x),f.y),
+                         mix(mix(hash(i+vec3(0,0,1)),hash(i+vec3(1,0,1)),f.x),mix(hash(i+vec3(0,1,1)),hash(i+vec3(1,1,1)),f.x),f.y),f.z);
+            }
+            float fbm(vec3 p) { float v=0.; float a=.5; for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}
+            void main() {
+              vec3 n = normalize(vNormal);
+              float landNoise = fbm(normalize(vPosition) * 3.15 + vec3(1.2, 2.8, .4));
+              float land = smoothstep(.5, .59, landNoise + sin(vPosition.y * .42) * .035);
+              float ice = smoothstep(.72, .93, abs(normalize(vPosition).y));
+              vec3 ocean = mix(vec3(.006,.055,.17), vec3(.01,.22,.42), max(0., n.y*.5+.5));
+              vec3 ground = mix(vec3(.06,.18,.08), vec3(.34,.31,.12), smoothstep(.54,.72,landNoise));
+              vec3 base = mix(ocean, ground, land);
+              base = mix(base, vec3(.76,.86,.9), ice * .72);
+              float diffuse = max(dot(n, normalize(lightDirection)), 0.);
+              float rim = pow(1.0 - max(dot(n, vec3(0.,0.,1.)), 0.), 3.0);
+              vec3 night = base * .055;
+              vec3 lit = base * (.26 + diffuse * 1.25) + vec3(.04,.35,.7) * rim * .32;
+              gl_FragColor = vec4(mix(night, lit, smoothstep(-.1,.12,dot(n,normalize(lightDirection)))), 1.);
+            }
+          `
+        });
+        const globe = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 96, 64), material);
+        globe.rotation.z = THREE.MathUtils.degToRad(23.4);
+        group.add(globe);
+
+        const atmosphere = new THREE.Mesh(
+          new THREE.SphereGeometry(EARTH_RADIUS * 1.055, 72, 48),
+          new THREE.ShaderMaterial({
+            side: THREE.BackSide,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            vertexShader: "varying vec3 n; void main(){n=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+            fragmentShader: "varying vec3 n; void main(){float i=pow(0.7-dot(n,vec3(0.,0.,1.)),4.);gl_FragColor=vec4(.15,.58,1.,i*.62);}"
+          })
+        );
+        group.add(atmosphere);
+        group.userData.globe = globe;
+        return group;
+      }
+
+      function createMoon() {
+        const geometry = new THREE.SphereGeometry(MOON_RADIUS, 72, 48);
+        const positions = geometry.attributes.position;
+        const p = new THREE.Vector3();
+        for (let i = 0; i < positions.count; i++) {
+          p.fromBufferAttribute(positions, i);
+          const rough = Math.sin(p.x * 18.1 + p.y * 7.2) * Math.sin(p.z * 16.3 - p.x * 4.7) * 0.018;
+          p.multiplyScalar(1 + rough);
+          positions.setXYZ(i, p.x, p.y, p.z);
+        }
+        geometry.computeVertexNormals();
+        const material = new THREE.MeshStandardMaterial({ color: 0x968f82, roughness: 0.98, metalness: 0.02 });
+        const sphere = new THREE.Mesh(geometry, material);
+        const craterMaterial = new THREE.MeshBasicMaterial({ color: 0x514e49, transparent: true, opacity: 0.55, depthWrite: false });
+        for (let i = 0; i < 18; i++) {
+          const crater = new THREE.Mesh(new THREE.CircleGeometry(0.05 + Math.random() * 0.13, 16), craterMaterial);
+          const azimuth = Math.random() * Math.PI * 2;
+          const z = Math.random() * 2 - 1;
+          const radius = Math.sqrt(1 - z * z);
+          const normal = new THREE.Vector3(radius * Math.cos(azimuth), radius * Math.sin(azimuth), z);
+          crater.position.copy(normal).multiplyScalar(MOON_RADIUS * 1.012);
+          crater.lookAt(crater.position.clone().add(normal));
+          sphere.add(crater);
+        }
+        return sphere;
+      }
+
+      function createPath() {
+        const points = [];
+        for (let i = 0; i <= 150; i++) points.push(startPoint.clone().lerp(endPoint, i / 150));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const line = new THREE.Line(
+          geometry,
+          new THREE.LineDashedMaterial({ color: 0x74e6ff, dashSize: 2.3, gapSize: 2.3, transparent: true, opacity: 0.34 })
+        );
+        line.computeLineDistances();
+        return line;
+      }
+
+      function createProbe() {
+        const group = new THREE.Group();
+        const core = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.8, 0),
+          new THREE.MeshBasicMaterial({ color: vehicles[state.vehicle].color })
+        );
+        core.scale.set(1.8, 0.55, 0.55);
+        core.rotation.z = -INCLINATION;
+        group.add(core);
+        const halo = new THREE.Mesh(
+          new THREE.SphereGeometry(1.2, 18, 12),
+          new THREE.MeshBasicMaterial({ color: vehicles[state.vehicle].color, transparent: true, opacity: 0.13, blending: THREE.AdditiveBlending, depthWrite: false })
+        );
+        group.add(halo);
+        const trailGeometry = new THREE.ConeGeometry(0.8, 8, 14, 1, true);
+        const trail = new THREE.Mesh(
+          trailGeometry,
+          new THREE.MeshBasicMaterial({ color: vehicles[state.vehicle].color, transparent: true, opacity: 0.38, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, depthWrite: false })
+        );
+        trail.rotation.z = Math.PI / 2;
+        trail.position.x = -4;
+        group.add(trail);
+        group.userData = { core, halo, trail };
+        return group;
+      }
+
+      function updateVehicle(key) {
+        state.vehicle = key;
+        state.warp = vehicles[key].warp;
+        ui.slider.value = warpToSlider(state.warp);
+        updateWarpDisplay();
+        resetSimulation();
+        const vehicle = vehicles[key];
+        probe.userData.core.material.color.setHex(vehicle.color);
+        probe.userData.halo.material.color.setHex(vehicle.color);
+        probe.userData.trail.material.color.setHex(vehicle.color);
+        path.material.color.setHex(vehicle.color);
+        ui.title.innerHTML = vehicle.title;
+        ui.copy.textContent = vehicle.copy;
+        document.querySelectorAll("[data-vehicle]").forEach(button => button.classList.toggle("active", button.dataset.vehicle === key));
+      }
+
+      function updateCameraMode(mode) {
+        state.camera = mode;
+        controls.enabled = mode === "cinematic";
+        document.querySelectorAll("[data-camera]").forEach(button => button.classList.toggle("active", button.dataset.camera === mode));
+        if (mode === "earth") {
+          camera.position.copy(travelDirection.clone().multiplyScalar(-17)).add(new THREE.Vector3(0, 9, 15));
+          camera.lookAt(probe.position);
+        } else if (mode === "follow") {
+          positionFollowCamera(1);
+        } else {
+          camera.position.set(180, 95, 490);
+          controls.target.set(CENTER_DISTANCE * 0.45, -70, 0);
+          controls.update();
+        }
+      }
+
+      function resetSimulation() {
+        state.running = false;
+        state.elapsed = 0;
+        state.phase = "OUTBOUND";
+        state.completed = false;
+        probe.position.copy(startPoint);
+        probe.visible = true;
+        ui.play.textContent = "Launch simulation";
+        ui.status.textContent = "SYSTEM READY · AWAITING LAUNCH";
+        updateTelemetry(0);
+      }
+
+      function toggleSimulation() {
+        if (state.completed) resetSimulation();
+        state.running = !state.running;
+        ui.play.textContent = state.running ? "Pause simulation" : "Resume simulation";
+        ui.status.textContent = state.running ? "TRANSIT ACTIVE · LIVE TELEMETRY" : "SIMULATION PAUSED";
+      }
+
+      function updateSimulation(delta) {
+        if (!state.running) return;
+        state.elapsed += delta * state.warp;
+        const vehicle = vehicles[state.vehicle];
+        const oneWay = SURFACE_DISTANCE_KM / vehicle.speed;
+        const total = oneWay * 2;
+        const tripProgress = Math.min(state.elapsed / oneWay, 2);
+        const outbound = tripProgress <= 1;
+        const legProgress = outbound ? tripProgress : 2 - tripProgress;
+        state.phase = outbound ? "OUTBOUND" : "RETURN";
+        probe.position.copy(startPoint).lerp(endPoint, legProgress);
+        probe.userData.trail.rotation.z = outbound ? Math.PI / 2 : -Math.PI / 2;
+        probe.userData.trail.position.x = outbound ? -4 : 4;
+        if (state.elapsed >= total) {
+          state.elapsed = total;
+          state.running = false;
+          state.completed = true;
+          state.phase = "SIGNAL RECEIVED";
+          probe.position.copy(startPoint);
+          ui.play.textContent = "Replay journey";
+          ui.status.textContent = "ROUND TRIP COMPLETE · SIGNAL RECEIVED";
+        }
+        updateTelemetry(legProgress);
+      }
+
+      function updateTelemetry(legProgress) {
+        const vehicle = vehicles[state.vehicle];
+        const oneWay = SURFACE_DISTANCE_KM / vehicle.speed;
+        const distanceToMoon = state.phase === "RETURN" ? SURFACE_DISTANCE_KM * (1 - legProgress) : SURFACE_DISTANCE_KM * (1 - legProgress);
+        const eta = Math.max(0, distanceToMoon / vehicle.speed);
+        ui.elapsed.textContent = formatDuration(state.elapsed);
+        ui.velocity.textContent = `${formatNumber(vehicle.speed)} km/s`;
+        ui.velocityC.textContent = `${(vehicle.speed / C).toFixed(vehicle.speed / C < .001 ? 6 : 3)} c`;
+        ui.distance.textContent = `${formatNumber(Math.max(0, distanceToMoon))} km`;
+        ui.eta.textContent = formatDurationWords(eta);
+        ui.phase.textContent = state.phase;
+        ui.progress.textContent = `${(legProgress * 100).toFixed(2)}%`;
+        ui.dot.style.left = `${legProgress * 100}%`;
+      }
+
+      function updateWarpDisplay() {
+        ui.warp.textContent = `${formatNumber(state.warp)}×`;
+        const fill = Number(ui.slider.value);
+        ui.slider.style.setProperty("--range-fill", `${fill}%`);
+      }
+
+      function positionFollowCamera(delta) {
+        const direction = state.phase === "RETURN" ? travelDirection.clone().negate() : travelDirection;
+        const desired = probe.position.clone().addScaledVector(direction, -8).add(new THREE.Vector3(0, 3.8, 5));
+        camera.position.lerp(desired, Math.min(1, delta * 4));
+        const look = probe.position.clone().addScaledVector(direction, 18);
+        camera.lookAt(look);
+      }
+
+      function updateCamera(delta) {
+        cameraTime += delta;
+        if (state.camera === "follow") {
+          positionFollowCamera(delta);
+        } else if (state.camera === "earth") {
+          camera.lookAt(probe.position);
+        } else if (!controls.enabled || !state.running) {
+          controls.update();
+        } else {
+          const center = probe.position.clone().lerp(moonPosition, 0.28);
+          controls.target.lerp(center, Math.min(1, delta * 0.3));
+          controls.update();
+        }
+      }
+
+      function updateLabels() {
+        positionLabel(ui.earthLabel, earth.position);
+        positionLabel(ui.moonLabel, moon.position);
+      }
+
+      function positionLabel(element, position) {
+        const projected = position.clone().project(camera);
+        const visible = projected.z < 1 && projected.x > -1.25 && projected.x < 1.25 && projected.y > -1.15 && projected.y < 1.15;
+        element.style.display = visible ? "block" : "none";
+        if (!visible) return;
+        element.style.left = `${(projected.x * .5 + .5) * innerWidth}px`;
+        element.style.top = `${(-projected.y * .5 + .5) * innerHeight}px`;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const delta = Math.min(clock.getDelta(), 0.08);
+        updateSimulation(delta);
+        updateCamera(delta);
+        earth.userData.globe.rotation.y += delta * 0.04;
+        moon.rotation.y += delta * 0.006;
+        probe.userData.halo.scale.setScalar(1 + Math.sin(performance.now() * 0.008) * 0.09);
+        updateLabels();
+        renderer.render(scene, camera);
+      }
+
+      function formatDuration(seconds) {
+        if (seconds < 10) return `${seconds.toFixed(2).padStart(5, "0")} s`;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = Math.floor(seconds % 60);
+        return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+      }
+
+      function formatDurationWords(seconds) {
+        if (seconds < 60) return `${seconds.toFixed(2)} sec`;
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${Math.floor(seconds % 60)}s`;
+        return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+      }
+
+      function formatNumber(number) {
+        return Math.round(number).toLocaleString("en-US");
+      }
+
+      function sliderToWarp(value) {
+        return Math.max(1, Math.round(Math.pow(10, Number(value) / 20)));
+      }
+
+      function warpToSlider(warp) {
+        return Math.round(Math.log10(warp) * 20);
+      }
+
+      document.querySelector("#vehicle-list").addEventListener("click", event => {
+        const button = event.target.closest("[data-vehicle]");
+        if (button) updateVehicle(button.dataset.vehicle);
+      });
+
+      document.querySelector("#camera-list").addEventListener("click", event => {
+        const button = event.target.closest("[data-camera]");
+        if (button) updateCameraMode(button.dataset.camera);
+      });
+
+      ui.slider.addEventListener("input", () => {
+        state.warp = sliderToWarp(ui.slider.value);
+        updateWarpDisplay();
+      });
+      ui.play.addEventListener("click", toggleSimulation);
+      ui.reset.addEventListener("click", resetSimulation);
+      ui.mobileToggle.addEventListener("click", () => ui.controls.classList.toggle("open"));
+
+      addEventListener("keydown", event => {
+        if (event.code === "Space") {
+          event.preventDefault();
+          toggleSimulation();
+        }
+        if (event.key.toLowerCase() === "r") resetSimulation();
+      });
+
+      addEventListener("resize", () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+    })();
+  </script>
+</body>
+</html>
