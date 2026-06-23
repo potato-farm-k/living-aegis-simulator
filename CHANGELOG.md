@@ -16,6 +16,7 @@
 
 ### Changed
 
+- 루트 simulator 런처 화면의 제목 크기, 설명 문구, simulator 링크 문구를 정리
 - `lunar-view-framing-simulator` control 순서, 화면 font, 지구 확대율 preset을 정리
 - 이후 독립 simulator 추가를 위한 repository-level 구조 정리
 - README, simulation 문서, `docs/` 메모를 한국어 중심으로 정리
