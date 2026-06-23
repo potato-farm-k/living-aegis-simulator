@@ -34,48 +34,50 @@
           <h2 id="controls-title">구도 조정</h2>
         </div>
 
-        <label class="control-row" for="earth-y">
-          <span>Earth Y Position</span>
-          <strong id="earth-y-value">38%</strong>
-          <input id="earth-y" type="range" min="18" max="72" step="1" value="38">
-        </label>
-
-        <label class="control-row" for="surface-height">
-          <span>Lunar Surface Height</span>
-          <strong id="surface-height-value">33%</strong>
-          <input id="surface-height" type="range" min="18" max="48" step="1" value="33">
-        </label>
-
         <label class="control-row" for="earth-scale">
-          <span>Earth Scale</span>
+          <span>Earth Scale / 지구 확대율</span>
           <strong id="earth-scale-value">3x</strong>
-          <input id="earth-scale" type="range" min="1" max="5" step="0.1" value="3">
+          <input id="earth-scale" type="range" min="1" max="10" step="0.1" value="3">
         </label>
 
         <div class="preset-group" aria-label="Earth scale presets">
           <button class="preset-button" type="button" data-scale="1">1x</button>
           <button class="preset-button active" type="button" data-scale="3">3x</button>
           <button class="preset-button" type="button" data-scale="5">5x</button>
+          <button class="preset-button" type="button" data-scale="7">7x</button>
+          <button class="preset-button" type="button" data-scale="10">10x</button>
         </div>
+
+        <label class="control-row" for="earth-y">
+          <span>Earth Vertical Position / 지구 세로 위치</span>
+          <strong id="earth-y-value">38%</strong>
+          <input id="earth-y" type="range" min="18" max="72" step="1" value="38">
+        </label>
+
+        <label class="control-row" for="surface-height">
+          <span>Lunar Surface Area / 달 표면 비중</span>
+          <strong id="surface-height-value">33%</strong>
+          <input id="surface-height" type="range" min="18" max="48" step="1" value="33">
+        </label>
 
         <label class="toggle-row" for="guides-toggle">
           <input id="guides-toggle" type="checkbox" checked>
-          <span>Guidelines</span>
+          <span>Guide Lines / 가이드라인</span>
         </label>
 
         <section class="readout" aria-labelledby="readout-title">
-          <h3 id="readout-title">현재 설정값</h3>
+          <h3 id="readout-title">Current Values / 현재 설정값</h3>
           <dl>
             <div>
               <dt>Earth Scale</dt>
               <dd id="readout-scale">3x</dd>
             </div>
             <div>
-              <dt>Earth Y Position</dt>
+              <dt>Earth Vertical Position</dt>
               <dd id="readout-earth-y">38%</dd>
             </div>
             <div>
-              <dt>Lunar Surface Height</dt>
+              <dt>Lunar Surface Area</dt>
               <dd id="readout-surface">33%</dd>
             </div>
             <div>

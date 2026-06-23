@@ -185,7 +185,7 @@ function drawGuideLine(y, width, label, color) {
   ctx.setLineDash([]);
 
   ctx.fillStyle = color;
-  ctx.font = "700 13px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+  ctx.font = "700 13px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
   ctx.fillText(label, 12, y - 8);
 }
 
@@ -207,7 +207,7 @@ function drawGuides(width, height) {
   ctx.setLineDash([]);
 
   ctx.fillStyle = guideColor;
-  ctx.font = "700 13px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
+  ctx.font = "700 13px system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif";
   ctx.fillText("Center", centerX + 10, centerY - 10);
 
   drawGuideLine(height * 0.75, width, "Lunar surface 1/4", surfaceGuideColor);
