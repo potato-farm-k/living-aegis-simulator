@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#05070f">
+  <title>Lunar View Framing Simulator</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <a class="back-link" href="../index.html">Simulator Launcher</a>
+      <div>
+        <p class="eyebrow">2D canvas framing reference</p>
+        <h1>Lunar View Framing Simulator</h1>
+        <p class="lede">
+          Living Aegis Origin의 달 표면 1인칭 화면 구도를 검증하기 위한 2D 참고 도구입니다.
+        </p>
+        <p class="notice">
+          이 화면은 공식 게임 구현물이 아니라 구도 검증용 참고 도구입니다.
+        </p>
+      </div>
+    </header>
+
+    <section class="workspace" aria-label="Lunar view framing controls">
+      <div class="canvas-panel">
+        <canvas id="framing-canvas" width="960" height="540" aria-label="달 표면에서 지구를 바라보는 2D 구도 미리보기"></canvas>
+      </div>
+
+      <aside class="control-panel" aria-labelledby="controls-title">
+        <div class="panel-heading">
+          <p class="eyebrow">Controls</p>
+          <h2 id="controls-title">구도 조정</h2>
+        </div>
+
+        <label class="control-row" for="earth-y">
+          <span>Earth Y Position</span>
+          <strong id="earth-y-value">38%</strong>
+          <input id="earth-y" type="range" min="18" max="72" step="1" value="38">
+        </label>
+
+        <label class="control-row" for="surface-height">
+          <span>Lunar Surface Height</span>
+          <strong id="surface-height-value">33%</strong>
+          <input id="surface-height" type="range" min="18" max="48" step="1" value="33">
+        </label>
+
+        <label class="control-row" for="earth-scale">
+          <span>Earth Scale</span>
+          <strong id="earth-scale-value">3x</strong>
+          <input id="earth-scale" type="range" min="1" max="5" step="0.1" value="3">
+        </label>
+
+        <div class="preset-group" aria-label="Earth scale presets">
+          <button class="preset-button" type="button" data-scale="1">1x</button>
+          <button class="preset-button active" type="button" data-scale="3">3x</button>
+          <button class="preset-button" type="button" data-scale="5">5x</button>
+        </div>
+
+        <label class="toggle-row" for="guides-toggle">
+          <input id="guides-toggle" type="checkbox" checked>
+          <span>Guidelines</span>
+        </label>
+
+        <section class="readout" aria-labelledby="readout-title">
+          <h3 id="readout-title">현재 설정값</h3>
+          <dl>
+            <div>
+              <dt>Earth Scale</dt>
+              <dd id="readout-scale">3x</dd>
+            </div>
+            <div>
+              <dt>Earth Y Position</dt>
+              <dd id="readout-earth-y">38%</dd>
+            </div>
+            <div>
+              <dt>Lunar Surface Height</dt>
+              <dd id="readout-surface">33%</dd>
+            </div>
+            <div>
+              <dt>Guides</dt>
+              <dd id="readout-guides">On</dd>
+            </div>
+          </dl>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>

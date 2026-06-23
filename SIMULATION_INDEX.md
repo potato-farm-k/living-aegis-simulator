@@ -8,6 +8,30 @@
 
 ## 등록된 simulators
 
+### Lunar View Framing Simulator
+
+경로: `lunar-view-framing-simulator/`
+
+상태: 1차 구현
+
+목적: 달 표면에서 지구를 바라보는 1인칭 게임 화면 구도 검증
+
+진입점: `lunar-view-framing-simulator/index.html`
+
+현재 확인된 구조:
+
+- `lunar-view-framing-simulator/index.html`
+- `lunar-view-framing-simulator/style.css`
+- `lunar-view-framing-simulator/script.js`
+- `lunar-view-framing-simulator/README.md`
+
+메모:
+
+- 지구 세로 위치, 달 표면 비중, 지구 확대율을 비교하기 위한 2D Canvas 참고 도구이다.
+- 1x / 3x / 5x 지구 확대율 preset을 제공한다.
+- 실제 천문 좌표, 3D 시점, 광속 지연, 전투/HUD/조준 시스템은 구현하지 않는다.
+- 공식 게임 화면의 최종 기준값을 확정하지 않는다.
+
 ### Earth-Moon Travel Simulator
 
 경로: `earth-moon-travel-simulator/`

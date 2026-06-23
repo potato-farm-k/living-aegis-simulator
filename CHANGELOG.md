@@ -4,6 +4,9 @@
 
 ### Added
 
+- `lunar-view-framing-simulator` 2D 달 표면 화면 구도 검증 simulator 추가
+- 지구 세로 위치, 달 표면 하단 비중, 지구 확대율 조정 control과 1x / 3x / 5x preset 추가
+- 루트 simulator 런처에서 `lunar-view-framing-simulator` 연결
 - Codex 반복 작업 지침을 담은 `AGENTS.md` 추가
 - 초기 simulator lab scaffold 추가
 - 루트 simulator 런처 페이지 추가
