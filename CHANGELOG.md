@@ -4,6 +4,7 @@
 
 ### Added
 
+- Codex 반복 작업 지침을 담은 `AGENTS.md` 추가
 - 초기 simulator lab scaffold 추가
 - 루트 simulator 런처 페이지 추가
 - 기존 `earth-moon-travel-simulator`를 루트 런처에서 연결
