@@ -4,6 +4,8 @@
 
 ### Added
 
+- `lunar-view-framing-simulator`의 `view-offset-mode` 2차 개선 후보를 문서에 등록
+- `orbital-attack-source-simulator`를 다음 후보 simulator로 문서에 등록
 - `lunar-view-framing-simulator` 2D 달 표면 화면 구도 검증 simulator 추가
 - 지구 세로 위치, 달 표면 하단 비중, 지구 확대율 조정 control과 1x / 3x / 5x / 7x / 10x preset 추가
 - 루트 simulator 런처에서 `lunar-view-framing-simulator` 연결
