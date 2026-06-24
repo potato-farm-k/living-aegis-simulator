@@ -22,6 +22,25 @@
 
 이 simulator는 확정값을 만드는 도구가 아니라, 여러 구도를 비교하고 Living Aegis Origin의 기본 화면 판단을 돕기 위한 참고 도구이다. 실제 천문 좌표, 3D 시점, 광속 지연, 전투/HUD/조준 시스템은 이번 범위에서 다루지 않는다.
 
+### 1차 기본 구도 후보값
+
+`lunar-view-framing-simulator` 기준 1차 기본 구도 후보는 다음과 같이 기록한다.
+
+- Earth Scale: 5x 또는 7x
+- Earth Vertical Position: 30%
+- Lunar Surface Area: 30%
+
+이 값들은 아직 Living Aegis Origin 게임 본체의 공식 확정값이 아니라, simulator 기준의 1차 기본 구도 후보이다. 이후 prototype에서 실제 조준, 미사일 식별, HUD 배치와 함께 다시 검증해야 한다.
+
+해석:
+
+- Earth Scale 5x와 7x는 둘 다 기본 구도 후보로 유지한다.
+- Earth Vertical Position 30%는 시야가 약간 변해도 지구가 안정적으로 보일 수 있는 후보값이다.
+- Lunar Surface Area 30%는 달 표면 존재감과 하늘/전투 공간 확보 사이의 절충값이다.
+- 달 표면 30%는 이후 크레이터, 언덕, 지평선 굴곡 같은 디테일을 표현하기에 적당한 규모로 본다.
+- 15x 확대는 기본 구도값이 아니라, 향후 줌 연출 또는 관측 모드 후보로 분리한다.
+- 15x 확대는 이번 simulator 구현 대상이 아니다.
+
 ### view-offset-mode 2차 개선 후보
 
 `view-offset-mode`는 `lunar-view-framing-simulator`의 다음 개선 후보이다. UI 표시명 후보는 `시야 오프셋 검증 모드`이며, 기본 구도 1차 검증이 끝난 뒤 추가 여부를 판단한다.

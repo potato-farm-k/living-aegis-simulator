@@ -28,6 +28,18 @@ lunar-view-framing-simulator/index.html
 
 `Guidelines`를 켜면 화면 중앙선과 달 표면 1/4, 1/3 기준선을 함께 확인할 수 있습니다. 현재 설정값은 조정 패널 아래에 표시됩니다.
 
+## 1차 기본 구도 후보
+
+현재 simulator 기준 1차 기본 구도 후보는 다음과 같습니다.
+
+- Earth Scale: 5x 또는 7x
+- Earth Vertical Position: 30%
+- Lunar Surface Area: 30%
+
+이 값들은 Living Aegis Origin 게임 본체의 공식 확정값이 아니라, simulator 기준의 1차 기본 구도 후보입니다. 이후 prototype에서 실제 조준, 미사일 식별, HUD 배치와 함께 다시 검증해야 합니다.
+
+15x 확대는 기본 구도값이 아니라 향후 줌 연출 또는 관측 모드 후보로 분리합니다. 15x 확대는 현재 simulator 구현 대상이 아닙니다.
+
 ## 현재 한계
 
 - 실제 천문 좌표를 계산하지 않습니다.

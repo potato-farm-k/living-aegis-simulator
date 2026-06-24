@@ -78,3 +78,9 @@
 결정: 플레이어 시야 이동 개념은 `lunar-view-framing-simulator`의 2차 개선 후보로 유지한다.
 
 이유: 기본 구도 1차 검증이 끝난 뒤 `시야 오프셋 검증 모드`를 추가해, 달 표면에서 지구를 바라보는 기본 구도가 제한된 시야 이동을 견디는지 확인하기 위해서이다. 실제 FPS식 마우스 조작과 전투 루프는 프로토타입 단계에서 다룬다.
+
+### lunar-view-framing-simulator의 1차 기본 구도 후보값을 기록
+
+결정: `lunar-view-framing-simulator` 기준 1차 기본 구도 후보값으로 Earth Scale 5x 또는 7x, Earth Vertical Position 30%, Lunar Surface Area 30%를 기록한다.
+
+이유: 이 값들은 게임 본체의 공식 확정값이 아니라 simulator 기준 후보이며, 이후 prototype에서 실제 조준, 미사일 식별, HUD 배치와 함께 검증해야 한다. 15x 확대는 기본 구도값이 아니라 향후 줌 연출 또는 관측 모드 후보로 분리하고, 이번 simulator 구현 대상에는 포함하지 않는다.

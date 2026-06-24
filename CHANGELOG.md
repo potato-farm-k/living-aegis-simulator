@@ -4,6 +4,7 @@
 
 ### Added
 
+- `lunar-view-framing-simulator`의 1차 기본 구도 후보값을 문서에 기록
 - `lunar-view-framing-simulator`의 `view-offset-mode` 2차 개선 후보를 문서에 등록
 - `orbital-attack-source-simulator`를 다음 후보 simulator로 문서에 등록
 - `lunar-view-framing-simulator` 2D 달 표면 화면 구도 검증 simulator 추가
