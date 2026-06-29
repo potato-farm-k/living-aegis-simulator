@@ -4,6 +4,8 @@
 
 ### Added
 
+- `prototype-07`의 위협 접근 방향 문제를 옆면 단면에서 검증하는 `lunar-threat-side-profile-simulator` 추가
+- source, boost, trajectory, Impact Warning Corridor, Lunar Defense Zone과 Visual Contact / Surface Occluded 상태 비교 기능 추가
 - `lunar-view-framing-simulator`의 1차 기본 구도 후보값을 문서에 기록
 - `lunar-view-framing-simulator`의 `view-offset-mode` 2차 개선 후보를 문서에 등록
 - `orbital-attack-source-simulator`를 다음 후보 simulator로 문서에 등록

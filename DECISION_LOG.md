@@ -84,3 +84,15 @@
 결정: `lunar-view-framing-simulator` 기준 1차 기본 구도 후보값으로 Earth Scale 5x 또는 7x, Earth Vertical Position 30%, Lunar Surface Area 30%를 기록한다.
 
 이유: 이 값들은 게임 본체의 공식 확정값이 아니라 simulator 기준 후보이며, 이후 prototype에서 실제 조준, 미사일 식별, HUD 배치와 함께 검증해야 한다. 15x 확대는 기본 구도값이 아니라 향후 줌 연출 또는 관측 모드 후보로 분리하고, 이번 simulator 구현 대상에는 포함하지 않는다.
+
+## 2026-06-29
+
+### 위협 접근 흐름을 side-profile simulator에서 먼저 검증
+
+상태: 후보 / 검증 중
+
+결정: 위협 접근 흐름은 `lunar-threat-side-profile-simulator`에서 source, boost, trajectory, Impact Warning Corridor, Lunar Defense Zone / Impact 관계를 먼저 검증한 뒤 prototype으로 넘긴다.
+
+이유: `prototype-07-threat-origin-types`에서 반복된 위에서 아래로 떨어지는 듯한 표현이 실제 trajectory 문제인지 camera pitch와 projection 문제인지 분리해 확인하기 위해서이다.
+
+보류: simulator 결과가 나오기 전에는 `prototype-07`의 정면 접근 구조, Three.js 전환, 실제 궤도 물리 구현을 확정하지 않는다.

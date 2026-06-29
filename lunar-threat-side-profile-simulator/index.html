@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070a10">
+  <title>Lunar Threat Side Profile Simulator</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <a class="back-link" href="../index.html">Simulator Launcher</a>
+      <div class="header-copy">
+        <p class="eyebrow">2D trajectory inspection tool</p>
+        <h1>Lunar Threat Side Profile Simulator</h1>
+        <p class="lede">
+          위협의 source, boost, trajectory, 경고 구간과 달 방어 지점 접근 흐름을 옆면 단면에서 검증합니다.
+        </p>
+        <p class="notice">
+          가상 비율을 사용하는 제작 보조 도구이며 실제 궤도 물리나 전투 조작을 구현하지 않습니다.
+        </p>
+      </div>
+    </header>
+
+    <section class="workspace" aria-label="Lunar threat side profile workspace">
+      <div class="visual-column">
+        <section class="canvas-panel" aria-labelledby="diagram-title">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="eyebrow">Side profile view</p>
+              <h2 id="diagram-title">위협 접근 단면</h2>
+            </div>
+            <span class="live-state" id="live-state">BOOST</span>
+          </div>
+
+          <canvas
+            id="trajectory-canvas"
+            width="1200"
+            height="720"
+            aria-label="지구 측 source에서 달 방어 지점까지 이어지는 위협 접근 단면과 정면 projection preview"
+          ></canvas>
+
+          <div class="visual-key" aria-label="Diagram legend">
+            <span><i class="key-source"></i>Source / Boost</span>
+            <span><i class="key-path"></i>Main Trajectory</span>
+            <span><i class="key-warning"></i>Impact Warning Corridor</span>
+            <span><i class="key-contact"></i>Visual Contact</span>
+            <span><i class="key-occluded"></i>Surface Occluded</span>
+          </div>
+        </section>
+
+        <section class="state-panel" aria-labelledby="state-title">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="eyebrow">Current state</p>
+              <h2 id="state-title">판정 상태</h2>
+            </div>
+          </div>
+          <dl class="state-grid">
+            <div><dt>Source Type</dt><dd id="state-source">Earth Surface</dd></div>
+            <div><dt>Trajectory Shape</dt><dd id="state-shape">Guided Curve</dd></div>
+            <div><dt>Progress</dt><dd id="state-progress">0.0%</dd></div>
+            <div><dt>Threat State</dt><dd id="state-threat">BOOST</dd></div>
+            <div><dt>Impact Warning</dt><dd id="state-warning" data-tone="off">Off</dd></div>
+            <div><dt>Visual Contact</dt><dd id="state-contact" data-tone="off">No</dd></div>
+            <div><dt>Surface Occluded</dt><dd id="state-occluded" data-tone="off">No</dd></div>
+            <div><dt>Threat On Screen</dt><dd id="state-screen" data-tone="off">No</dd></div>
+            <div><dt>Predicted Contact</dt><dd id="state-predicted" data-tone="off">No</dd></div>
+            <div><dt>Camera Pitch</dt><dd id="state-pitch">12°</dd></div>
+            <div><dt>Vertical FOV</dt><dd id="state-fov">46°</dd></div>
+          </dl>
+        </section>
+      </div>
+
+      <aside class="control-panel" aria-labelledby="controls-title">
+        <div class="panel-heading">
+          <p class="eyebrow">Controls</p>
+          <h2 id="controls-title">검증 조건</h2>
+        </div>
+
+        <div class="select-grid">
+          <label class="select-control" for="source-type">
+            <span>sourceType</span>
+            <select id="source-type">
+              <option value="earth">Earth Surface</option>
+              <option value="orbital">Orbital</option>
+              <option value="test">Test Source</option>
+            </select>
+          </label>
+
+          <label class="select-control" for="trajectory-shape">
+            <span>trajectoryShape</span>
+            <select id="trajectory-shape">
+              <option value="straight">Straight</option>
+              <option value="arc">Arc</option>
+              <option value="guided" selected>Guided Curve</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="control-section">
+          <label class="range-control" for="boost-duration">
+            <span>boostDuration</span><output id="boost-duration-value">1.8 s</output>
+            <input id="boost-duration" type="range" min="0.5" max="3.5" step="0.1" value="1.8">
+          </label>
+
+          <label class="range-control" for="curve-amount">
+            <span>trajectoryCurveAmount</span><output id="curve-amount-value">58%</output>
+            <input id="curve-amount" type="range" min="0" max="100" step="1" value="58">
+          </label>
+
+          <label class="range-control" for="threat-speed">
+            <span>threatSpeed</span><output id="threat-speed-value">110 sim u/s</output>
+            <input id="threat-speed" type="range" min="40" max="220" step="5" value="110">
+          </label>
+
+          <label class="range-control" for="warning-progress">
+            <span>warningStartProgress</span><output id="warning-progress-value">72%</output>
+            <input id="warning-progress" type="range" min="50" max="90" step="1" value="72">
+          </label>
+        </div>
+
+        <div class="control-section">
+          <label class="range-control" for="camera-pitch">
+            <span>cameraPitch</span><output id="camera-pitch-value">12°</output>
+            <input id="camera-pitch" type="range" min="-12" max="34" step="1" value="12">
+          </label>
+
+          <label class="range-control" for="vertical-fov">
+            <span>verticalFOV</span><output id="vertical-fov-value">46°</output>
+            <input id="vertical-fov" type="range" min="24" max="80" step="2" value="46">
+          </label>
+
+          <label class="range-control" for="defense-radius">
+            <span>defenseZoneRadius</span><output id="defense-radius-value">72 sim u</output>
+            <input id="defense-radius" type="range" min="36" max="120" step="2" value="72">
+          </label>
+
+          <label class="range-control" for="trail-length">
+            <span>trailLength</span><output id="trail-length-value">16 points</output>
+            <input id="trail-length" type="range" min="4" max="32" step="1" value="16">
+          </label>
+        </div>
+
+        <div class="actions">
+          <button class="primary-button" id="play-toggle" type="button">Pause</button>
+          <button class="secondary-button" id="restart-button" type="button">Restart</button>
+          <button class="secondary-button" id="defaults-button" type="button">Defaults</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>

@@ -55,6 +55,28 @@
 - 이 기능은 게임 조작 구현이 아니라 구도 안정성 검증용이다.
 - 마우스 조준, 발사, 미사일, 격추, 타겟 락온, 카메라 반동은 프로토타입 영역으로 분리한다.
 
+## Lunar Threat Side Profile Simulator
+
+`prototype-07-threat-origin-types`에서 위협이 정면 하늘에서 플레이어를 향해 돌진하기보다 화면 위쪽에서 아래로 내려와 `Lunar Defense Zone`에 꽂히는 것처럼 보이는 문제가 반복되었다.
+
+정면 prototype을 계속 수정하기 전에 `lunar-threat-side-profile-simulator`에서 다음 접근 흐름을 옆면 단면 구도로 먼저 검증한다.
+
+```text
+source → boost → trajectory → Impact Warning Corridor → Lunar Defense Zone / Impact
+```
+
+이 simulator는 실제 지구-달 비율이나 정밀 궤도 물리를 재현하지 않는다. 가상 비율을 사용해 위협의 출발점, boost 단계, 주 trajectory, 마지막 방어 구간과 충돌 지점의 관계를 설명하고, camera pitch와 projection 문제를 실제 trajectory 문제와 분리하는 제작 보조 도구이다.
+
+상태 정의:
+
+- `Impact Warning Corridor`: trajectory progress가 지정한 기준 이상인 마지막 방어 구간이다.
+- `Surface Occluded`: Player Camera와 Threat Marker 사이의 line of sight가 단순화된 달 표면 ridge에 막힌 상태이다.
+- `Visual Contact`: Threat Marker가 Camera View Cone 안에 있고 `Surface Occluded`가 아닌 상태이다.
+- `Threat On Screen`: projection marker가 정면 preview의 vertical FOV 안에 표시되는 상태이다. 표시 좌표와 직접 시야 확보 여부는 같은 의미가 아니다.
+- `Predicted Contact`: 아직 직접 보이지 않더라도 예측 trajectory 또는 Impact Warning Corridor 기준으로 충돌을 경고할 수 있는 상태이다.
+
+현재는 후보 / 검증 중이다. Impact Warning Corridor 진입 기준, Visual Contact와 Surface Occluded 판정, Lunar Defense Zone과 Impact Point 위치 기준이 정리된 뒤 prototype으로 전달한다.
+
 ## Orbital Attack Source Simulator 후보
 
 `orbital-attack-source-simulator`는 지구 표면 기지와 지구 궤도 공격 위성의 공격 원천, 위성 고도, 속도, 식별성, 발사 타이밍을 검토하기 위한 다음 후보 simulator이다.

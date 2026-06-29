@@ -8,6 +8,38 @@
 
 ## 등록된 simulators
 
+### Lunar Threat Side Profile Simulator
+
+경로: `lunar-threat-side-profile-simulator/`
+
+상태: prototype-07 위협 접근 문제 검토용 side-profile simulator / 후보·검증 중
+
+목적: 위협 접근 흐름을 옆면 단면 구도로 분리해 source, boost, trajectory, Impact Warning Corridor, Lunar Defense Zone / Impact 관계를 검증한다.
+
+진입점: `lunar-threat-side-profile-simulator/index.html`
+
+현재 확인된 구조:
+
+- `lunar-threat-side-profile-simulator/index.html`
+- `lunar-threat-side-profile-simulator/style.css`
+- `lunar-threat-side-profile-simulator/script.js`
+- `lunar-threat-side-profile-simulator/README.md`
+
+확인 질문:
+
+- 위협의 시작점과 boost 단계가 명확히 구분되는가?
+- trajectory가 Lunar Defense Zone을 향해 접근하는 흐름으로 읽히는가?
+- Impact Warning Corridor가 공간상의 마지막 방어 구간으로 보이는가?
+- Visual Contact와 Surface Occluded가 서로 다른 상태로 표현되는가?
+- cameraPitch와 verticalFOV 문제를 실제 trajectory 문제와 분리해 볼 수 있는가?
+
+링크: [Lunar Threat Side Profile Simulator](./lunar-threat-side-profile-simulator/)
+
+메모:
+
+- 실제 지구-달 비율이나 정밀 궤도 물리를 사용하지 않는 Canvas 2D 제작 보조 도구이다.
+- 결과가 정리되기 전에는 `prototype-07`의 정면 접근 구조나 Three.js 전환을 확정하지 않는다.
+
 ### Lunar View Framing Simulator
 
 경로: `lunar-view-framing-simulator/`
