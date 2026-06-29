@@ -2,6 +2,7 @@ const canvas = document.querySelector("#trajectory-canvas");
 const ctx = canvas.getContext("2d");
 
 const controls = {
+  repeatLaunch: document.querySelector("#repeat-launch"),
   sourceType: document.querySelector("#source-type"),
   trajectoryShape: document.querySelector("#trajectory-shape"),
   boostDuration: document.querySelector("#boost-duration"),
@@ -28,6 +29,7 @@ const outputs = {
 const readout = {
   source: document.querySelector("#state-source"),
   shape: document.querySelector("#state-shape"),
+  speed: document.querySelector("#state-speed"),
   progress: document.querySelector("#state-progress"),
   threat: document.querySelector("#state-threat"),
   warning: document.querySelector("#state-warning"),
@@ -37,6 +39,10 @@ const readout = {
   predicted: document.querySelector("#state-predicted"),
   pitch: document.querySelector("#state-pitch"),
   fov: document.querySelector("#state-fov"),
+  repeat: document.querySelector("#state-repeat"),
+  phase: document.querySelector("#state-phase"),
+  nextLaunch: document.querySelector("#state-next-launch"),
+  pending: document.querySelector("#state-pending"),
   liveState: document.querySelector("#live-state"),
 };
 
@@ -47,6 +53,7 @@ const buttons = {
 };
 
 const defaults = {
+  repeatLaunch: true,
   sourceType: "earth",
   trajectoryShape: "guided",
   boostDuration: 1.8,
@@ -71,13 +78,18 @@ const shapeNames = {
   guided: "Guided Curve",
 };
 
+const REPEAT_DELAY_SECONDS = 1.25;
+
 const animation = {
   progress: 0,
   running: true,
   lastTime: performance.now(),
+  cycle: "flight",
+  repeatRemaining: 0,
 };
 
 let viewport = { width: 1200, height: 720, dpr: 1 };
+let activeLaunchSettings;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -94,19 +106,46 @@ function normalizeAngle(angle) {
   return result;
 }
 
-function values() {
+function readLaunchControlValues() {
   return {
     sourceType: controls.sourceType.value,
     trajectoryShape: controls.trajectoryShape.value,
     boostDuration: Number(controls.boostDuration.value),
     curveAmount: Number(controls.curveAmount.value),
     threatSpeed: Number(controls.threatSpeed.value),
+  };
+}
+
+function readLiveControlValues() {
+  return {
     warningProgress: Number(controls.warningProgress.value) / 100,
     cameraPitch: Number(controls.cameraPitch.value),
     verticalFov: Number(controls.verticalFov.value),
     defenseRadius: Number(controls.defenseRadius.value),
     trailLength: Number(controls.trailLength.value),
   };
+}
+
+function currentValues() {
+  return {
+    ...activeLaunchSettings,
+    ...readLiveControlValues(),
+  };
+}
+
+function pendingLaunchDifferences() {
+  const pending = readLaunchControlValues();
+  const definitions = [
+    { key: "sourceType", label: "Source", format: (value) => sourceNames[value] },
+    { key: "trajectoryShape", label: "Trajectory", format: (value) => shapeNames[value] },
+    { key: "boostDuration", label: "Boost", format: (value) => `${value.toFixed(1)}s` },
+    { key: "curveAmount", label: "Curve", format: (value) => `${value}%` },
+    { key: "threatSpeed", label: "Speed", format: (value) => `${value}` },
+  ];
+
+  return definitions
+    .filter(({ key }) => pending[key] !== activeLaunchSettings[key])
+    .map(({ key, label, format }) => ({ key, text: `${label}: ${format(pending[key])}` }));
 }
 
 function totalDuration(state) {
@@ -225,6 +264,15 @@ function runtimeState(state, model, width, height) {
     threatOnScreen,
     threatState,
   };
+}
+
+function launchPhase(runtime) {
+  if (animation.cycle === "waiting") return "RELAUNCH WAIT";
+  if (!animation.running && animation.cycle === "flight") return "PAUSED";
+  if (runtime.progress >= 0.998) return "IMPACT";
+  if (runtime.progress <= runtime.boostProgress) return "BOOST";
+  if (runtime.impactWarning) return "WARNING CORRIDOR";
+  return "MAIN TRAJECTORY";
 }
 
 function drawBackground(width, height) {
@@ -554,7 +602,7 @@ function drawProjectionPreview(model, state, runtime, width, height, compact) {
 }
 
 function render() {
-  const state = values();
+  const state = currentValues();
   const { width, height } = viewport;
   const compact = width < 720;
   const model = sceneModel(width, height, state);
@@ -581,9 +629,20 @@ function setBooleanReadout(element, active, activeText = "Yes") {
 }
 
 function updateReadout(state, runtime) {
-  outputs.boostDuration.textContent = `${state.boostDuration.toFixed(1)} s`;
-  outputs.curveAmount.textContent = `${state.curveAmount}%`;
-  outputs.threatSpeed.textContent = `${state.threatSpeed} sim u/s`;
+  const pendingSettings = readLaunchControlValues();
+  const pendingDifferences = pendingLaunchDifferences();
+  const pendingKeys = new Set(pendingDifferences.map(({ key }) => key));
+  const nextLaunchControls = {
+    sourceType: controls.sourceType,
+    trajectoryShape: controls.trajectoryShape,
+    boostDuration: controls.boostDuration,
+    curveAmount: controls.curveAmount,
+    threatSpeed: controls.threatSpeed,
+  };
+
+  outputs.boostDuration.textContent = `${pendingSettings.boostDuration.toFixed(1)} s`;
+  outputs.curveAmount.textContent = `${pendingSettings.curveAmount}%`;
+  outputs.threatSpeed.textContent = `${pendingSettings.threatSpeed} sim u/s`;
   outputs.warningProgress.textContent = `${Math.round(state.warningProgress * 100)}%`;
   outputs.cameraPitch.textContent = `${state.cameraPitch}°`;
   outputs.verticalFov.textContent = `${state.verticalFov}°`;
@@ -592,11 +651,30 @@ function updateReadout(state, runtime) {
 
   readout.source.textContent = sourceNames[state.sourceType];
   readout.shape.textContent = shapeNames[state.trajectoryShape];
+  readout.speed.textContent = `${state.threatSpeed} sim u/s`;
   readout.progress.textContent = `${(runtime.progress * 100).toFixed(1)}%`;
   readout.threat.textContent = runtime.threatState;
-  readout.liveState.textContent = runtime.threatState;
   readout.pitch.textContent = `${state.cameraPitch}°`;
   readout.fov.textContent = `${state.verticalFov}°`;
+
+  const phase = launchPhase(runtime);
+  readout.phase.textContent = phase;
+  readout.repeat.textContent = controls.repeatLaunch.checked ? "On" : "Off";
+  readout.repeat.dataset.tone = controls.repeatLaunch.checked ? "on" : "off";
+  readout.nextLaunch.textContent = animation.cycle === "waiting"
+    ? `${animation.repeatRemaining.toFixed(1)} s`
+    : "—";
+  readout.pending.textContent = pendingDifferences.length
+    ? pendingDifferences.map(({ text }) => text).join(" · ")
+    : "No changes";
+  readout.pending.dataset.tone = pendingDifferences.length ? "warning" : "off";
+  readout.liveState.textContent = animation.cycle === "waiting"
+    ? `NEXT ${animation.repeatRemaining.toFixed(1)}s`
+    : phase;
+
+  Object.entries(nextLaunchControls).forEach(([key, control]) => {
+    control.closest(".next-launch-control").dataset.pending = pendingKeys.has(key).toString();
+  });
 
   readout.warning.textContent = runtime.impactWarning ? "Active" : "Off";
   readout.warning.dataset.tone = runtime.impactWarning ? "warning" : "off";
@@ -625,8 +703,11 @@ function resizeCanvas() {
 }
 
 function restart() {
+  activeLaunchSettings = readLaunchControlValues();
   animation.progress = 0;
   animation.running = true;
+  animation.cycle = "flight";
+  animation.repeatRemaining = 0;
   animation.lastTime = performance.now();
   buttons.play.textContent = "Pause";
   render();
@@ -634,27 +715,42 @@ function restart() {
 
 function setDefaults() {
   Object.entries(defaults).forEach(([key, value]) => {
-    controls[key].value = value;
+    if (controls[key].type === "checkbox") controls[key].checked = value;
+    else controls[key].value = value;
   });
   restart();
 }
 
 function togglePlay() {
-  if (animation.progress >= 1) {
+  if (!animation.running && animation.cycle === "complete") {
     restart();
     return;
   }
   animation.running = !animation.running;
   animation.lastTime = performance.now();
   buttons.play.textContent = animation.running ? "Pause" : "Resume";
+  render();
 }
 
 Object.values(controls).forEach((control) => {
   control.addEventListener("input", render);
 });
 
-controls.sourceType.addEventListener("change", restart);
-controls.trajectoryShape.addEventListener("change", restart);
+controls.repeatLaunch.addEventListener("change", () => {
+  if (!controls.repeatLaunch.checked && animation.cycle === "waiting") {
+    animation.cycle = "complete";
+    animation.repeatRemaining = 0;
+    animation.running = false;
+    buttons.play.textContent = "Replay";
+  } else if (controls.repeatLaunch.checked && animation.cycle === "complete") {
+    animation.cycle = "waiting";
+    animation.repeatRemaining = REPEAT_DELAY_SECONDS;
+    animation.running = true;
+    animation.lastTime = performance.now();
+    buttons.play.textContent = "Pause";
+  }
+  render();
+});
 buttons.play.addEventListener("click", togglePlay);
 buttons.restart.addEventListener("click", restart);
 buttons.defaults.addEventListener("click", setDefaults);
@@ -666,11 +762,22 @@ function animate(time) {
   animation.lastTime = time;
 
   if (animation.running) {
-    const state = values();
-    animation.progress = Math.min(1, animation.progress + delta / totalDuration(state));
-    if (animation.progress >= 1) {
-      animation.running = false;
-      buttons.play.textContent = "Replay";
+    if (animation.cycle === "flight") {
+      const state = currentValues();
+      animation.progress = Math.min(1, animation.progress + delta / totalDuration(state));
+      if (animation.progress >= 1) {
+        if (controls.repeatLaunch.checked) {
+          animation.cycle = "waiting";
+          animation.repeatRemaining = REPEAT_DELAY_SECONDS;
+        } else {
+          animation.cycle = "complete";
+          animation.running = false;
+          buttons.play.textContent = "Replay";
+        }
+      }
+    } else if (animation.cycle === "waiting") {
+      animation.repeatRemaining = Math.max(0, animation.repeatRemaining - delta);
+      if (animation.repeatRemaining <= 0) restart();
     }
     render();
   }
@@ -678,5 +785,6 @@ function animate(time) {
   requestAnimationFrame(animate);
 }
 
+activeLaunchSettings = readLaunchControlValues();
 resizeCanvas();
 requestAnimationFrame(animate);

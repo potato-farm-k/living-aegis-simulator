@@ -58,8 +58,9 @@
             </div>
           </div>
           <dl class="state-grid">
-            <div><dt>Source Type</dt><dd id="state-source">Earth Surface</dd></div>
-            <div><dt>Trajectory Shape</dt><dd id="state-shape">Guided Curve</dd></div>
+            <div><dt>Active Source</dt><dd id="state-source">Earth Surface</dd></div>
+            <div><dt>Active Trajectory</dt><dd id="state-shape">Guided Curve</dd></div>
+            <div><dt>Active Speed</dt><dd id="state-speed">110 sim u/s</dd></div>
             <div><dt>Progress</dt><dd id="state-progress">0.0%</dd></div>
             <div><dt>Threat State</dt><dd id="state-threat">BOOST</dd></div>
             <div><dt>Impact Warning</dt><dd id="state-warning" data-tone="off">Off</dd></div>
@@ -69,6 +70,10 @@
             <div><dt>Predicted Contact</dt><dd id="state-predicted" data-tone="off">No</dd></div>
             <div><dt>Camera Pitch</dt><dd id="state-pitch">12°</dd></div>
             <div><dt>Vertical FOV</dt><dd id="state-fov">46°</dd></div>
+            <div><dt>Repeat Launch</dt><dd id="state-repeat" data-tone="on">On</dd></div>
+            <div><dt>Launch Phase</dt><dd id="state-phase">Boost</dd></div>
+            <div><dt>Next Launch In</dt><dd id="state-next-launch">—</dd></div>
+            <div><dt>Pending Next Launch</dt><dd id="state-pending" data-tone="off">No changes</dd></div>
           </dl>
         </section>
       </div>
@@ -79,49 +84,65 @@
           <h2 id="controls-title">검증 조건</h2>
         </div>
 
-        <div class="select-grid">
-          <label class="select-control" for="source-type">
-            <span>sourceType</span>
-            <select id="source-type">
-              <option value="earth">Earth Surface</option>
-              <option value="orbital">Orbital</option>
-              <option value="test">Test Source</option>
-            </select>
-          </label>
+        <label class="toggle-control" for="repeat-launch">
+          <span>
+            <strong>Auto Repeat</strong>
+            <small>Impact 후 순차 재발사</small>
+          </span>
+          <input id="repeat-launch" type="checkbox" checked>
+        </label>
 
-          <label class="select-control" for="trajectory-shape">
-            <span>trajectoryShape</span>
-            <select id="trajectory-shape">
-              <option value="straight">Straight</option>
-              <option value="arc">Arc</option>
-              <option value="guided" selected>Guided Curve</option>
-            </select>
-          </label>
-        </div>
+        <p class="application-note">
+          Source·boost·trajectory·curve·speed는 다음 발사부터, Camera·FOV·warning은 현재 발사에 즉시 반영됩니다.
+        </p>
 
-        <div class="control-section">
-          <label class="range-control" for="boost-duration">
+        <div class="control-section next-launch-section">
+          <p class="control-group-label">Next launch settings</p>
+
+          <div class="select-grid">
+            <label class="select-control next-launch-control" for="source-type">
+              <span>sourceType</span>
+              <select id="source-type">
+                <option value="earth">Earth Surface</option>
+                <option value="orbital">Orbital</option>
+                <option value="test">Test Source</option>
+              </select>
+            </label>
+
+            <label class="select-control next-launch-control" for="trajectory-shape">
+              <span>trajectoryShape</span>
+              <select id="trajectory-shape">
+                <option value="straight">Straight</option>
+                <option value="arc">Arc</option>
+                <option value="guided" selected>Guided Curve</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="range-control next-launch-control" for="boost-duration">
             <span>boostDuration</span><output id="boost-duration-value">1.8 s</output>
             <input id="boost-duration" type="range" min="0.5" max="3.5" step="0.1" value="1.8">
           </label>
 
-          <label class="range-control" for="curve-amount">
+          <label class="range-control next-launch-control" for="curve-amount">
             <span>trajectoryCurveAmount</span><output id="curve-amount-value">58%</output>
             <input id="curve-amount" type="range" min="0" max="100" step="1" value="58">
           </label>
 
-          <label class="range-control" for="threat-speed">
+          <label class="range-control next-launch-control" for="threat-speed">
             <span>threatSpeed</span><output id="threat-speed-value">110 sim u/s</output>
             <input id="threat-speed" type="range" min="40" max="220" step="5" value="110">
           </label>
+        </div>
+
+        <div class="control-section live-section">
+          <p class="control-group-label">Live adjustments</p>
 
           <label class="range-control" for="warning-progress">
             <span>warningStartProgress</span><output id="warning-progress-value">72%</output>
             <input id="warning-progress" type="range" min="50" max="90" step="1" value="72">
           </label>
-        </div>
 
-        <div class="control-section">
           <label class="range-control" for="camera-pitch">
             <span>cameraPitch</span><output id="camera-pitch-value">12°</output>
             <input id="camera-pitch" type="range" min="-12" max="34" step="1" value="12">

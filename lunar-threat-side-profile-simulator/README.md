@@ -47,6 +47,30 @@ lunar-threat-side-profile-simulator/index.html
 
 값은 실제 천문 단위가 아니라 구조 비교를 위한 가상 비율과 `sim u` 단위를 사용합니다.
 
+## 반복 발사와 설정 적용 시점
+
+`Auto Repeat`는 기본적으로 켜져 있습니다. 위협이 Impact Point에 도달하면 짧은 대기 후 같은 Canvas에서 다음 위협을 한 발씩 순차 발사합니다. 동시에 여러 위협을 만들거나 wave, 난이도, 점수 시스템으로 확장하지 않습니다.
+
+현재 발사에 실시간 반영되는 설정:
+
+- `cameraPitch`
+- `verticalFOV`
+- `warningStartProgress`
+- `defenseZoneRadius`
+- `trailLength`
+
+다음 발사부터 반영되는 설정:
+
+- `sourceType`
+- `boostDuration`
+- `trajectoryShape`
+- `trajectoryCurveAmount`
+- `threatSpeed`
+
+다음 발사 설정을 변경하면 상태 패널의 `Pending Next Launch`와 control 강조로 대기 중인 항목을 확인할 수 있습니다. `Restart`는 pending 값을 즉시 적용해 새 발사를 시작하며, `Defaults`는 기본값으로 새 발사를 시작합니다.
+
+검증 조건 영역은 적용 시점에 따라 `Next launch settings`와 `Live adjustments`로 나누고, Canvas 크기를 유지하면서 padding과 간격을 줄여 한 화면에서 더 많은 조건을 비교할 수 있도록 정리했습니다.
+
 ## 상태 정의
 
 - `Impact Warning Corridor`: trajectory progress가 `warningStartProgress` 이상인 마지막 방어 구간입니다.
