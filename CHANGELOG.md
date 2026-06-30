@@ -4,6 +4,8 @@
 
 ### Added
 
+- 지구-달 실제 크기, 평균 거리와 이동시간 체감을 단순하게 비교하는 `earth-moon-scale-time-simulator` 추가
+- 이동체 speed preset, Custom Speed, time warp, 방향 전환, loop/replay control과 compact 정보 패널 추가
 - `prototype-07`의 위협 접근 방향 문제를 옆면 단면에서 검증하는 `lunar-threat-side-profile-simulator` 추가
 - source, boost, trajectory, Impact Warning Corridor, Lunar Defense Zone과 Visual Contact / Surface Occluded 상태 비교 기능 추가
 - `lunar-view-framing-simulator`의 1차 기본 구도 후보값을 문서에 기록

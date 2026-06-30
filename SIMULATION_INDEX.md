@@ -89,6 +89,40 @@
 - 현재 simulator는 CSS와 JavaScript를 `index.html` 내부에 포함한다.
 - simulator 폴더명에는 순번을 붙이지 않는다.
 
+### Earth-Moon Scale Time Simulator
+
+경로: `earth-moon-scale-time-simulator/`
+
+상태: reference simulator / scale-time sense viewer
+
+목적: 지구-달 실제 크기/거리/이동시간 체감을 단순한 시각화 중심으로 확인한다.
+
+진입점: `earth-moon-scale-time-simulator/index.html`
+
+현재 확인된 구조:
+
+- `earth-moon-scale-time-simulator/index.html`
+- `earth-moon-scale-time-simulator/style.css`
+- `earth-moon-scale-time-simulator/script.js`
+- `earth-moon-scale-time-simulator/README.md`
+
+확인 질문:
+
+- 실제 상대 축척으로 표시한 지구와 달의 크기 차이가 한눈에 보이는가?
+- 평균 중심 거리 384,400 km의 빈 공간이 충분히 멀게 느껴지는가?
+- 이동체 preset에 따라 실제 이동시간의 차이가 이해되는가?
+- time warp로 긴 이동을 어느 정도까지 관찰 가능한 시간으로 압축할 수 있는가?
+- 방향 전환과 반복 재생으로 거리감과 속도감을 익힐 수 있는가?
+
+링크: [Earth-Moon Scale Time Simulator](./earth-moon-scale-time-simulator/)
+
+메모:
+
+- 실제 반지름 비율과 평균 중심 거리를 같은 화면 축척으로 표시하는 Canvas 2D reference viewer이다.
+- 중력, 가속·감속, 실제 궤도 물리는 계산하지 않고 일정 속도 직선 이동으로 비교한다.
+- 기존 `earth-moon-travel-simulator`의 목적과 구현은 그대로 유지한다.
+- 전투, 조준, 요격, Impact Warning과 gameplay HUD를 다루지 않는다.
+
 ## 후보 simulators
 
 ### Orbital Attack Source Simulator

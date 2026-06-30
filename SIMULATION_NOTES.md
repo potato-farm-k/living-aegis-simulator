@@ -10,6 +10,20 @@
 - field of view reference는 이 문서와 `docs/field-of-view-notes.md`에 정리한다.
 - light delay reference는 이 문서와 `docs/light-delay-notes.md`에 정리한다.
 
+## Earth-Moon Scale Time Simulator
+
+기존 `earth-moon-travel-simulator`는 지표와 수치 정보가 많아 전체 거리감과 속도감을 직관적으로 보기 어렵다. 기존 simulator의 목적과 기능은 유지하고, 이를 직접 개조하지 않는다.
+
+`earth-moon-scale-time-simulator`는 지구-달 실제 크기와 거리, 이동체별 이동시간, time warp, 방향별 반복 실행을 통해 스케일 감각을 익히는 Canvas 2D 기반 reference simulator로 추가한다.
+
+해석 기준:
+
+- 지구와 달의 원반 반지름 및 평균 중심 거리는 같은 화면 축척을 사용한다.
+- 작은 달의 원반은 확대하지 않고, halo와 label만 식별 보조로 사용한다.
+- 이동시간은 평균 중심 거리 384,400 km를 preset 속도로 나눈 단순 비교값이다.
+- 이동체는 일정 속도로 직선 이동하며 실제 임무 궤도, 중력, 가속·감속은 재현하지 않는다.
+- 전투, 조준, 요격, Impact Warning 또는 gameplay 판단으로 직접 연결하지 않는다.
+
 ## Lunar View Framing Simulator
 
 `lunar-view-framing-simulator`는 달 표면에서 지구를 바라보는 1인칭 화면 구도를 빠르게 비교하기 위해 추가한 2D Canvas 제작 보조 도구이다.

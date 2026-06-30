@@ -96,3 +96,13 @@
 이유: `prototype-07-threat-origin-types`에서 반복된 위에서 아래로 떨어지는 듯한 표현이 실제 trajectory 문제인지 camera pitch와 projection 문제인지 분리해 확인하기 위해서이다.
 
 보류: simulator 결과가 나오기 전에는 `prototype-07`의 정면 접근 구조, Three.js 전환, 실제 궤도 물리 구현을 확정하지 않는다.
+
+## 2026-06-30
+
+### 지구-달 scale-time 체감을 독립 reference simulator로 분리
+
+결정: 지구-달 거리감과 이동시간 체감은 combat prototype과 분리된 `earth-moon-scale-time-simulator`에서 다룬다.
+
+이유: 기존 `earth-moon-travel-simulator`의 목적과 기능을 유지하면서, 지표와 수치 정보가 시각적 체감을 덮지 않는 단순한 반복 비교 화면이 별도로 필요하다. 실제 상대 크기와 평균 거리, 이동체 preset, time warp, 방향별 반복 실행에 집중한다.
+
+보류: 이 simulator의 결과만으로 전투 구조, 실제 궤도 물리 구현, 위협 또는 Impact Warning 판정을 확정하지 않는다.
