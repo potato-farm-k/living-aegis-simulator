@@ -23,6 +23,7 @@
 
 ### Changed
 
+- 루트 simulator 런처 목록을 각 simulator 생성 시점 기준 최신순으로 정렬
 - `earth-moon-scale-time-simulator` 정보 패널을 category별 가로형 layout으로 정리하고 상세 축척값을 기본 노출
 - 중복 Progress 표시를 우측 `Route progress`로 통합하고 Earth/Moon 표시 위치를 아래로 조정
 - `lunar-threat-side-profile-simulator`에 순차 자동 반복 발사, active/pending 설정 구분과 compact 검증 조건 UI 적용
