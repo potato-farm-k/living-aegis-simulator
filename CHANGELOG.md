@@ -23,6 +23,8 @@
 
 ### Changed
 
+- `earth-moon-scale-time-simulator` 정보 패널을 category별 가로형 layout으로 정리하고 상세 축척값을 기본 노출
+- 중복 Progress 표시를 우측 `Route progress`로 통합하고 Earth/Moon 표시 위치를 아래로 조정
 - `lunar-threat-side-profile-simulator`에 순차 자동 반복 발사, active/pending 설정 구분과 compact 검증 조건 UI 적용
 - 루트 simulator 런처 화면의 제목 크기, 설명 문구, simulator 링크 문구를 정리
 - `lunar-view-framing-simulator` control 순서, 화면 font, 지구 확대율 preset을 정리

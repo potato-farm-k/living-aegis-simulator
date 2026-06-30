@@ -28,28 +28,39 @@
         >지구-달 축척 시각화를 보려면 Canvas를 지원하는 브라우저가 필요합니다.</canvas>
 
         <section class="info-panel" aria-labelledby="info-title">
-          <div class="info-heading">
+          <div class="run-summary">
             <p class="eyebrow" id="info-title">Current run</p>
-            <span class="run-state" id="run-state">Ready</span>
+            <strong class="run-state" id="run-state">Ready</strong>
+            <span class="run-caption">Scale-time reference</span>
           </div>
-          <dl class="readout-list">
-            <div><dt>Preset</dt><dd id="info-preset">Light / Laser</dd></div>
-            <div><dt>Speed</dt><dd id="info-speed">299,792 km/s</dd></div>
-            <div><dt>Time warp</dt><dd id="info-warp">1×</dd></div>
-            <div><dt>Progress</dt><dd id="info-progress">0.0%</dd></div>
-            <div><dt>Travel time</dt><dd id="info-duration">1.28초</dd></div>
-            <div><dt>Direction</dt><dd id="info-direction">Earth → Moon</dd></div>
-            <div><dt>Distance</dt><dd>384,400 km</dd></div>
-          </dl>
-          <button class="details-toggle" id="details-toggle" type="button" aria-expanded="false" aria-controls="scale-details">
-            Show Details
-          </button>
-          <div class="scale-details" id="scale-details" hidden>
-            <p>Earth diameter <strong>12,742 km</strong></p>
-            <p>Moon diameter <strong>3,474.8 km</strong></p>
-            <p>Diameter ratio <strong>3.67 : 1</strong></p>
-            <p>Warped viewing time <strong id="info-view-duration">1.28초</strong></p>
-            <p class="detail-note">천체 원반과 중심 거리는 같은 축척입니다. halo와 이동체 marker만 식별을 위해 확대했습니다.</p>
+
+          <div class="info-group">
+            <p class="group-label">Object</p>
+            <dl>
+              <div><dt>Preset</dt><dd id="info-preset">Light / Laser</dd></div>
+              <div><dt>Speed</dt><dd id="info-speed">299,792 km/s</dd></div>
+              <div><dt>Direction</dt><dd id="info-direction">Earth → Moon</dd></div>
+            </dl>
+          </div>
+
+          <div class="info-group">
+            <p class="group-label">Time</p>
+            <dl>
+              <div><dt>Time warp</dt><dd id="info-warp">1×</dd></div>
+              <div><dt>Travel time</dt><dd id="info-duration">1.28초</dd></div>
+              <div><dt>Viewing time</dt><dd id="info-view-duration">1.28초</dd></div>
+            </dl>
+          </div>
+
+          <div class="info-group scale-group">
+            <p class="group-label">Scale</p>
+            <dl>
+              <div><dt>Distance</dt><dd>384,400 km</dd></div>
+              <div><dt>Earth diameter</dt><dd>12,742 km</dd></div>
+              <div><dt>Moon diameter</dt><dd>3,474.8 km</dd></div>
+              <div><dt>Diameter ratio</dt><dd>3.67 : 1</dd></div>
+            </dl>
+            <p class="scale-note">Bodies + distance: true relative scale<br>Halo + marker: visibility enhanced</p>
           </div>
         </section>
       </div>

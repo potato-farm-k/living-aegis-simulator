@@ -11,8 +11,9 @@
 - 지구와 달의 실제 반지름 비율을 반영한 천체 원반
 - 평균 중심 거리 384,400 km를 기준으로 한 Earth-Moon distance path
 - 이동체 marker, 진행 경로, 방향 화살표, trail ghost points
-- 현재 preset, speed, time warp, 진행률, 예상 이동시간, 방향을 보여 주는 compact 정보 패널
-- `Show Details` / `Hide Details`로 여닫는 추가 축척 정보
+- 현재 preset, speed, 방향, time warp와 예상 이동시간을 category별로 묶은 가로형 정보 패널
+- Earth/Moon diameter, diameter ratio, warped viewing time을 기본 노출하는 상세 축척 정보
+- 우측 control panel의 단일 `Route progress` 표시
 
 천체 원반과 중심 거리는 같은 화면 축척을 사용합니다. 작은 달의 원반은 확대하지 않으며, Earth/Moon halo와 이동체 marker만 화면 식별을 위해 실제 비율보다 크게 표시합니다.
 
@@ -39,7 +40,7 @@
 
 `1×`, `10×`, `100×`, `1,000×`, `10,000×`, `Custom`을 제공합니다. `Custom`은 1–1,000,000× 범위에서 입력할 수 있습니다.
 
-정보 패널의 `Travel time`은 선택 속도 기준의 실제 비교 시간을, details의 `Warped viewing time`은 현재 time warp로 압축한 관찰 시간을 뜻합니다.
+정보 패널의 `Travel time`은 선택 속도 기준의 실제 비교 시간을, `Viewing time`은 현재 time warp로 압축한 관찰 시간을 뜻합니다.
 
 ## 반복 실행 옵션
 
@@ -67,7 +68,7 @@ earth-moon-scale-time-simulator/index.html
 - 속도 preset을 바꿀 때 실제 이동시간 차이를 쉽게 이해할 수 있는가?
 - time warp가 긴 이동을 관찰 가능한 길이로 압축한다는 의미가 명확한가?
 - 반복 재생으로 거리감과 속도감을 익힐 수 있는가?
-- compact 정보 패널이 핵심 시각화를 과하게 가리지 않는가?
+- 가로형 정보 패널이 Earth/Moon 시각화를 가리지 않으면서 category별 수치를 빠르게 비교할 수 있는가?
 
 ## 이후 전달 기준
 

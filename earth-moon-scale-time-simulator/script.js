@@ -61,12 +61,9 @@ const elements = {
   loopLabel: document.querySelector("#loop-label"),
   replayEarth: document.querySelector("#replay-earth"),
   replayMoon: document.querySelector("#replay-moon"),
-  detailsToggle: document.querySelector("#details-toggle"),
-  details: document.querySelector("#scale-details"),
   infoPreset: document.querySelector("#info-preset"),
   infoSpeed: document.querySelector("#info-speed"),
   infoWarp: document.querySelector("#info-warp"),
-  infoProgress: document.querySelector("#info-progress"),
   infoDuration: document.querySelector("#info-duration"),
   infoViewDuration: document.querySelector("#info-view-duration"),
   infoDirection: document.querySelector("#info-direction"),
@@ -185,7 +182,6 @@ function updateReadouts() {
   elements.infoPreset.textContent = preset.label;
   elements.infoSpeed.textContent = formatSpeed(speed);
   elements.infoWarp.textContent = `${formatNumber(warp, 0)}×`;
-  elements.infoProgress.textContent = `${progressPercent.toFixed(1)}%`;
   elements.infoDuration.textContent = formatDuration(duration);
   elements.infoViewDuration.textContent = formatDuration(viewingDuration);
   elements.infoDirection.textContent = directionLabel();
@@ -444,7 +440,7 @@ function renderCanvas() {
 
   const earthX = width * (width < 560 ? 0.08 : 0.075);
   const moonX = width * (width < 560 ? 0.92 : 0.925);
-  const y = height * 0.61;
+  const y = height * 0.66;
   const centerDistancePixels = moonX - earthX;
   const earthRadius = centerDistancePixels * (EARTH_RADIUS_KM / EARTH_MOON_DISTANCE_KM);
   const moonRadius = centerDistancePixels * (MOON_RADIUS_KM / EARTH_MOON_DISTANCE_KM);
@@ -549,13 +545,6 @@ elements.loop.addEventListener("change", () => {
   }
   updateReadouts();
   elements.statusMessage.textContent = state.loop ? "반복 재생 켜짐" : "반복 재생 꺼짐";
-});
-
-elements.detailsToggle.addEventListener("click", () => {
-  const expanded = elements.detailsToggle.getAttribute("aria-expanded") === "true";
-  elements.detailsToggle.setAttribute("aria-expanded", String(!expanded));
-  elements.detailsToggle.textContent = expanded ? "Show Details" : "Hide Details";
-  elements.details.hidden = expanded;
 });
 
 window.addEventListener("keydown", (event) => {
