@@ -23,6 +23,8 @@
 
 ### Changed
 
+- `SIMULATION_NOTES.md`에 Threat Type Draft v0.1의 계열별 simulation 검증 질문 추가
+- `AGENTS.md`에 세 Living Aegis 저장소의 공통 문서 업데이트 원칙 추가
 - 루트 simulator 런처 목록을 각 simulator 생성 시점 기준 최신순으로 정렬
 - `earth-moon-scale-time-simulator` 정보 패널을 category별 가로형 layout으로 정리하고 상세 축척값을 기본 노출
 - 중복 Progress 표시를 우측 `Route progress`로 통합하고 Earth/Moon 표시 위치를 아래로 조정

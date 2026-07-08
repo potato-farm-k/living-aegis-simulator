@@ -106,3 +106,13 @@
 이유: 기존 `earth-moon-travel-simulator`의 목적과 기능을 유지하면서, 지표와 수치 정보가 시각적 체감을 덮지 않는 단순한 반복 비교 화면이 별도로 필요하다. 실제 상대 크기와 평균 거리, 이동체 preset, time warp, 방향별 반복 실행에 집중한다.
 
 보류: 이 simulator의 결과만으로 전투 구조, 실제 궤도 물리 구현, 위협 또는 Impact Warning 판정을 확정하지 않는다.
+
+## 2026-07-08
+
+### Threat Type Draft v0.1 simulation 후속 검토 범위
+
+결정: Missile-type Threat을 P0 검증 대상으로 두고 source, boost, trajectory, Lunar Defense Zone, Impact Warning Corridor의 관계를 우선 확인한다. Beam/Charge-type Threat은 P1 line of sight와 발사 전 source 차단 후보, Mass/Object-type Threat은 P2 느린 heavy special threat 후보로 기록한다.
+
+이유: simulator는 위협 유형의 게임 규칙을 확정하거나 구현하는 곳이 아니라, 각 유형이 요구하는 구조와 시각적 질문을 분리해 검증하는 도구이기 때문이다.
+
+보류: 이번 문서 업데이트만으로 Beam/Charge-type 또는 Mass/Object-type 전용 simulator를 새로 만들지 않는다.

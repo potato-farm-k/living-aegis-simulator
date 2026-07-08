@@ -107,6 +107,33 @@ source → boost → trajectory → Impact Warning Corridor → Lunar Defense Zo
 
 이 후보는 2D Canvas 기반으로 검토할 수 있지만, 지금 즉시 구현하지 않는다. 공격 위성 설정은 게임 루프, 난이도, 세계관에 직접 영향을 줄 수 있으므로 구현 전에 추가 검토가 필요하다.
 
+## Threat Type Simulation Follow-up Candidates
+
+위협 유형의 상세 분류는 `living-aegis-origin/docs/GDD.md`에서 관리한다. 이 문서에는 Threat Type Draft v0.1을 simulation 관점에서 검토할 때 필요한 질문만 기록하며, 아래 항목만으로 새 simulator 구현을 확정하지 않는다.
+
+### 1. Missile-type Threat — P0
+
+- source 위치에 따른 boost와 trajectory의 시각적 차이를 확인한다.
+- 정면 source에서는 접근 경로가 거의 직선으로 보이는지 확인한다.
+- source가 위, 아래, 옆으로 어긋나면 boost 이후 trajectory가 달 방향으로 휘어져 보이는지 확인한다.
+- 마지막 구간에서 Lunar Defense Zone과 Impact Warning Corridor로 수렴하는지 확인한다.
+
+### 2. Beam/Charge-type Threat — P1 후보
+
+- line of sight 기반 위협 표현이 가능한지 확인한다.
+- 발사 전 충전, 조준선, 예측 신호가 플레이어에게 읽히는지 확인한다.
+- 줌 또는 관측 모드와 결합할 수 있는지 확인한다.
+
+Beam/Charge-type Threat은 발사 후 빔을 막는 구조가 아니라 발사 전 source 차단을 검토하는 후속 변주이며, 현재 simulator 구현 대상이 아니다.
+
+### 3. Mass/Object-type Threat — P2 후보
+
+- 느린 물체의 낙하감이 자연스럽게 읽히는지 확인한다.
+- 달 중력 영향이 시각적으로 자연스럽게 보이는지 확인한다.
+- main threat가 아니라 special threat로 사용하는 것이 적절한지 확인한다.
+
+Mass/Object-type Threat은 느리고 무거운 압박을 검토하는 후속 특수 위협이며, 현재 simulator 구현 대상이 아니다.
+
 ## 열린 질문
 
 - 메인 게임 화면에서 달 표면 기준 지구는 어느 정도 크게 보여야 하는가?
